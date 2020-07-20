@@ -81,6 +81,7 @@ end
 
 %% plot reaction time
 
+h=figure;
 %subplot(1,2,2);
 
 barRTmat = rtAll;
