@@ -1,7 +1,7 @@
 %{
 EEG_Preprocess1
 Author: Tom Bullock, UCSB Attention Lab
-Date: 06.08.19
+Date: 06.08.19 (last updated 06.24.20)
 
 Notes:
 If we need to re-extract data from behavior, see previous version of
@@ -14,15 +14,15 @@ Make script flexible for importing CNTs or MATs (split)
 
 %}
 
-% load eeglab into path
-% cd '/home/bullock/matlab_2016b/TOOLBOXES/eeglab14_1_1b'
-% eeglab
-% clear 
-% close all
-% cd /home/bullock/CBF_Attention/Analysis_Scripts
+%load eeglab into path
+cd '/home/bullock/matlab_2016b/TOOLBOXES/eeglab14_1_1b'
+eeglab
+clear 
+close all
+cd /home/bullock/CBF_Attention/Analysis_Scripts
 
 %subjectNumbers = [134,237,350,576,577,578,588,592]; %pre2019
-subjects = 249;
+subjects = [134,237,350,576,577,578,588,592]; %999%998%997;% 249;
 
 % set dirs (remove redundant ones)
 eegRawDir = '/home/bullock/CBF_Attention/EEG_Raw';
@@ -44,24 +44,41 @@ for iSub=1:length(subjects)
         elseif  j==5; thisCond='hyperair';
         end
         
+        try
+        
         % load data
-        load([eegRawDir '/' sprintf('sj%d_',sjNum) thisCond '.mat'])
+        if sjNum==249
+            load([eegRawDir '/' sprintf('sj%d_',sjNum) thisCond '.mat'])
+        else
+            EEG = pop_loadcnt([eegRawDir '/' sprintf('sj%d_',sjNum) thisCond '.cnt'] ,'dataformat', 'auto', 'memmapfile', ''); % import cnt 
+        end
+        
         EEG = pop_reref( EEG, [16 17] ,'keepref','on');% ref to channels 16 and 17 (mastoids 1&2)
         EEG=pop_chanedit(EEG, 'lookup','/home/bullock/matlab_2016b/TOOLBOXES/eeglab14_1_1b/plugins/dipfit2.3/standard_BESA/standard-10-5-cap385.elp'); % add channel data
         EEG = pop_eegfiltnew(EEG, 0.1, 30); % filter
         
         % remove unnecessary channels
-        EEG = pop_select(EEG,'nochannel',[18,19,20,23]);
-        disp('Removing Channels 18,19,20,23 - is this correct?')
+        if ismember(sjNum,[249,997,998,999])
+            EEG = pop_select(EEG,'nochannel',[18,19,20,23]); % remove extra unnecessary chans
+            disp('Removing Channels 18,19,20,23 - is this correct?')
+        end
         
         % remove eye-blinks using AAR toolbox
         EEG = pop_crls_regression( EEG, [18 19], 1, 0.9999, 0.01,[]);
         
-        % add study/behavioral data to EEG struct
-        EEG.studyInfo = load([behRawDir '/' sprintf('sj%d_',sjNum) thisCond '_beh.mat'])
+%         % add study/behavioral data to EEG struct (not necessary)
+%         if sjNum==249
+%             EEG.studyInfo = load([behRawDir '/' sprintf('sj%d_',sjNum) thisCond '_beh.mat']);
+%         else
+%             EEG.studyInfo = load([behRawDir '/' sprintf('sj%d_',sjNum) thisCond '.mat']);
+%         end
         
         % save data
-        save([eegFtDir '/' sprintf('sj%d_',sjNum) thisCond '_ft.mat'])
+        save([eegFtDir '/' sprintf('sj%d_',sjNum) thisCond '_ft.mat'],'EEG')
+        
+        catch
+           disp(['Skipping sj ' num2str(sjNum) ' cond ' thisCond]) 
+        end
     
     end
 end
@@ -70,279 +87,289 @@ end
 
 
 
-%Draw the data.(adhoc)
-eegplot(EEG.data,...
-    'eloc_file',EEG.chanlocs, ...
-    'srate',EEG.srate,...
-    'events',EEG.event);
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%% tom comment on 062420 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%% import and preprocess data
-for i=1:size(subjectNumbers,2)
-    iSub = subjectNumbers(i);
-    dirTmp = [];
-    dirTmp = dir(sprintf('%02d*.cnt',iSub));    % find all the files with that sjNum in the dir and the .cnt file extension
-    
-    %% loop through each of the subject files
-    for j=1:size(dirTmp,1)
-        eeg_file = dirTmp(j).name;   % pulls out string name
-        eeg_file = strrep(eeg_file,'.cnt',''); % gets rid of .bdf file extension
-        
-        % import neuroscan files and preprocess
-        if importFilterCNTs == 1         
-            
-            % preprocessing
-            EEG = pop_loadcnt([eegRawDir '/' eeg_file '.cnt'] ,'dataformat', 'auto', 'memmapfile', '');% imports neuroscan (.cnt) file  
-            EEG = pop_reref( EEG, [16 17] ,'keepref','on');% references to channels 16 and 17 (mastoids 1&2)
-            EEG=pop_chanedit(EEG, 'lookup','/home/bullock/matlab_2011b/TOOLBOXES/eeglab13_0_1b/plugins/dipfit2.2/standard_BESA/standard-10-5-cap385.elp'); % add channel data    
-            EEG = pop_eegfiltnew(EEG, 0.1, 30); % filter data
-            
-            % add binlist and overwrites EEG event list with bin labels 
-            EEG  = pop_creabasiceventlist( EEG , 'AlphanumericCleaning', 'on', 'BoundaryNumeric', { -99 }, 'BoundaryString',{ 'boundary' } );       
-            if iSub~=578% applies binlist for all subs EXCEPT 578 (no resps logged)    
-                %Apply binlist (needs to be from a set loc + need to create logfiles props)
-                EEG  = pop_binlister( EEG , 'BDF', ['/home/bullock/Calgary/Data_Revisit_2018/Analysis' '/bin_lister_calgary_data.txt'],...
-                'ExportEL', ['/home/bullock/Calgary/Data_Revisit_2018/EEG_Bin_Lister_Logs' '/' 'bin_lister_log_' eeg_file '.txt'], 'IndexEL',  1, 'SendEL2',...
-                'EEG&Text', 'UpdateEEG', 'on', 'Voutput', 'EEG' );
-            elseif iSub==578   
-                %Apply binlist (needs to be from a set loc + need to create logfiles props)
-                EEG  = pop_binlister( EEG , 'BDF', ['/home/bullock/Calgary/Data_Revisit_2018/Analysis' '/bin_lister_calgary_data_special_578.txt'],...
-                'ExportEL', ['/home/bullock/Calgary/Data_Revisit_2018/EEG_Bin_Lister_Logs' '/' 'bin_lister_log_' eeg_file '.txt'], 'IndexEL',  1, 'SendEL2',...
-                'EEG&Text', 'UpdateEEG', 'on', 'Voutput', 'EEG' );
-            end             
-            EEG = pop_overwritevent( EEG, 'binlabel'); 
-            
-            % correct for eyeblinks using crls
-            EEG = pop_crls_regression( EEG, [18 19], 1, 0.9999, 0.01,[]);%Corrects for blinks using regression (Conventional RLS) 
-            
-            % save data
-            EEG = pop_saveset(EEG,'filename', [eeg_file '_ft_bl.set'],'filepath',eegFtDir);
-            
-        end
-    end
-end
 
-
-%% Generate regular length epochs
-for i=1:size(subjectNumbers,2)
-    iSub = subjectNumbers(i);
-    dirTmp = [];
-    dirTmp = dir(sprintf('sj%02d*.cnt',iSub));    % find all the files with that sjNum in the dir and the .cnt file extension
-    
-    %% loop through each of the subject files
-    for j=1:size(dirTmp,1)
-        eeg_file = dirTmp(j).name;   % pulls out string name
-        eeg_file = strrep(eeg_file,'.cnt',''); % gets rid of .bdf file extension
-        
-        %% do epoching
-        if epochDataAR==1
-            
-            % slightly different bin epoching for sub 578 coz no responses
-            % logged.  This allows them to be processed normally...
-            if iSub~=578
-                nBinTypes=1:6;
-            elseif iSub==578
-                nBinTypes=[1 2 5 6];
-            end
-            
-            % extract epochs from different subjects/conditions
-            for m=nBinTypes
-
-                % define names of bins (not sure if all needed)
-                if m==1; binName='B1(102)'; epochName='STD'; epochSize=[-1 2]; epochRej=[-.1 .5];  % non-target frequent (ORIG = [-1.
-                elseif m==2; binName='B2(101)'; epochName='TARG'; epochSize=[-1 3]; epochRej=[-.1 2];   % TARGET RESPONSE (Epochs are response locked) (ORIG = [-.1 2])
-                %elseif m==3; binName='B3(101)'; epochName='TARG_MISSED'; epochSize=[-1 3]; epochRej=[-.1 2];   % TARGET RESPONSE (Epochs are response locked)
-                %elseif m==4; binName='B4(120)'; epochName='TARG_RESP_LOCKED'; epochSize=[-.5 .5]; epochRej=[-.5 .5];
-                elseif m==5; binName='202'; epochName='FIX_GLOBAL';epochSize=[0 .5]; epochRej=[0 .5];
-                elseif m==6; binName='B1(102)'; epochName='TASK_GLOBAL'; epochSize=[0 .5]; epochRej=[0 .5];  
-                end
-                
-                % create bin based epochs and do artifact rej (ext. values)
-                EEG = pop_loadset([eegFtDir '/' eeg_file '_ft_bl.set']); %Re-Loads the dataset
-                EEG = pop_epoch( EEG, {  binName  }, epochSize, 'newname', [sprintf('sj%02d',iSub) 'epochs_' epochName], 'epochinfo', 'yes');
-                
-                if m<5  % if normal epoching
-                    EEG = pop_rmbase( EEG, [-100 0]);
-                else % if creating peochs for global analysis
-                    EEG = pop_rmbase(EEG,[]);
-                end
-                
-                % saves each bin epoched dataset separately
-                %EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep' epochName '.set'],'filepath',eegEpDir);
-                
-                % threshold AR
-                chans = 1:17;   % 16/17 are mastoids, for now just do P, POz and Oz elects
-                minAmp = -75;
-                maxAmp = 75;
-                minTime = epochRej(1);
-                maxTime = epochRej(2);
-                
-                %%EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,0);    % final zero marks for rej but doesn't rej
-                %%pop_summary_AR_eeg_detection(EEG, [cdTmp '/AR_summary_EEGLAB_REGULAR_EPOCHS/' eeg_file '_' epochName '_AR_sum.txt']);  % creates summary
-                EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,1);    % final '1' rejects marked trials immediately
-                
-                % create "rejection matrix" (easy AR total viewing)
-                if m==1                
-                    newRejMatrix.std(i,1) = iSub;
-                    newRejMatrix.std(i,j+1) = sum(EEG.reject.rejthresh);
-                    newRejMatrix.stdntrials(i,1) = iSub;
-                    newRejMatrix.stdntrials(i,j+1) = size(EEG.epoch,2);               
-                elseif m==2 
-                    newRejMatrix.hit(i,1) = iSub;
-                    newRejMatrix.hit(i,j+1) = sum(EEG.reject.rejthresh);
-                    newRejMatrix.hitntrials(i,1) = iSub;
-                    newRejMatrix.hitntrials(i,j+1) = size(EEG.epoch,2); 
-%                 elseif m==3
-%                     newRejMatrix.miss(i,1) = iSub;
-%                     newRejMatrix.miss(i,j+1) = sum(EEG.reject.rejthresh);
-%                     newRejMatrix.missntrials(i,1) = iSub;
-%                     newRejMatrix.missntrials(i,j+1) = size(EEG.epoch,2);  
-                end  
-                save([dataCompiled '/' 'newRejMatrix.mat'],'newRejMatrix');
-                
-                %% save the epoched datasets
-                EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',eegEpDir);
-
-%                 if m~=4
-%                     EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',[cdTmp '/A_REGULAR_EPOCHS/']);
-%                 elseif m==4
-%                     EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',[cdTmp '/A_REGULAR_EPOCHS/']);
-%                     EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',[cdTmp '/A_STUDY_RESP_LOCKED/']);    % save a version in separate folder for separate STUDY
+% 
+% 
+% 
+% %Draw the data.(adhoc)
+% eegplot(EEG.data,...
+%     'eloc_file',EEG.chanlocs, ...
+%     'srate',EEG.srate,...
+%     'events',EEG.event);
+% 
+% 
+% 
+% 
+% 
+% %% import and preprocess data
+% for i=1:size(subjectNumbers,2)
+%     iSub = subjectNumbers(i);
+%     dirTmp = [];
+%     dirTmp = dir(sprintf('%02d*.cnt',iSub));    % find all the files with that sjNum in the dir and the .cnt file extension
+%     
+%     %% loop through each of the subject files
+%     for j=1:size(dirTmp,1)
+%         eeg_file = dirTmp(j).name;   % pulls out string name
+%         eeg_file = strrep(eeg_file,'.cnt',''); % gets rid of .bdf file extension
+%         
+%         % import neuroscan files and preprocess
+%         if importFilterCNTs == 1         
+%             
+%             % preprocessing
+%             EEG = pop_loadcnt([eegRawDir '/' eeg_file '.cnt'] ,'dataformat', 'auto', 'memmapfile', '');% imports neuroscan (.cnt) file  
+%             EEG = pop_reref( EEG, [16 17] ,'keepref','on');% references to channels 16 and 17 (mastoids 1&2)
+%             EEG=pop_chanedit(EEG, 'lookup','/home/bullock/matlab_2011b/TOOLBOXES/eeglab13_0_1b/plugins/dipfit2.2/standard_BESA/standard-10-5-cap385.elp'); % add channel data    
+%             EEG = pop_eegfiltnew(EEG, 0.1, 30); % filter data
+%             
+%             % add binlist and overwrites EEG event list with bin labels 
+%             EEG  = pop_creabasiceventlist( EEG , 'AlphanumericCleaning', 'on', 'BoundaryNumeric', { -99 }, 'BoundaryString',{ 'boundary' } );       
+%             if iSub~=578% applies binlist for all subs EXCEPT 578 (no resps logged)    
+%                 %Apply binlist (needs to be from a set loc + need to create logfiles props)
+%                 EEG  = pop_binlister( EEG , 'BDF', ['/home/bullock/Calgary/Data_Revisit_2018/Analysis' '/bin_lister_calgary_data.txt'],...
+%                 'ExportEL', ['/home/bullock/Calgary/Data_Revisit_2018/EEG_Bin_Lister_Logs' '/' 'bin_lister_log_' eeg_file '.txt'], 'IndexEL',  1, 'SendEL2',...
+%                 'EEG&Text', 'UpdateEEG', 'on', 'Voutput', 'EEG' );
+%             elseif iSub==578   
+%                 %Apply binlist (needs to be from a set loc + need to create logfiles props)
+%                 EEG  = pop_binlister( EEG , 'BDF', ['/home/bullock/Calgary/Data_Revisit_2018/Analysis' '/bin_lister_calgary_data_special_578.txt'],...
+%                 'ExportEL', ['/home/bullock/Calgary/Data_Revisit_2018/EEG_Bin_Lister_Logs' '/' 'bin_lister_log_' eeg_file '.txt'], 'IndexEL',  1, 'SendEL2',...
+%                 'EEG&Text', 'UpdateEEG', 'on', 'Voutput', 'EEG' );
+%             end             
+%             EEG = pop_overwritevent( EEG, 'binlabel'); 
+%             
+%             % correct for eyeblinks using crls
+%             EEG = pop_crls_regression( EEG, [18 19], 1, 0.9999, 0.01,[]);%Corrects for blinks using regression (Conventional RLS) 
+%             
+%             % save data
+%             EEG = pop_saveset(EEG,'filename', [eeg_file '_ft_bl.set'],'filepath',eegFtDir);
+%             
+%         end
+%     end
+% end
+% 
+% 
+% %% Generate regular length epochs
+% for i=1:size(subjectNumbers,2)
+%     iSub = subjectNumbers(i);
+%     dirTmp = [];
+%     dirTmp = dir(sprintf('sj%02d*.cnt',iSub));    % find all the files with that sjNum in the dir and the .cnt file extension
+%     
+%     %% loop through each of the subject files
+%     for j=1:size(dirTmp,1)
+%         eeg_file = dirTmp(j).name;   % pulls out string name
+%         eeg_file = strrep(eeg_file,'.cnt',''); % gets rid of .bdf file extension
+%         
+%         %% do epoching
+%         if epochDataAR==1
+%             
+%             % slightly different bin epoching for sub 578 coz no responses
+%             % logged.  This allows them to be processed normally...
+%             if iSub~=578
+%                 nBinTypes=1:6;
+%             elseif iSub==578
+%                 nBinTypes=[1 2 5 6];
+%             end
+%             
+%             % extract epochs from different subjects/conditions
+%             for m=nBinTypes
+% 
+%                 % define names of bins (not sure if all needed)
+%                 if m==1; binName='B1(102)'; epochName='STD'; epochSize=[-1 2]; epochRej=[-.1 .5];  % non-target frequent (ORIG = [-1.
+%                 elseif m==2; binName='B2(101)'; epochName='TARG'; epochSize=[-1 3]; epochRej=[-.1 2];   % TARGET RESPONSE (Epochs are response locked) (ORIG = [-.1 2])
+%                 %elseif m==3; binName='B3(101)'; epochName='TARG_MISSED'; epochSize=[-1 3]; epochRej=[-.1 2];   % TARGET RESPONSE (Epochs are response locked)
+%                 %elseif m==4; binName='B4(120)'; epochName='TARG_RESP_LOCKED'; epochSize=[-.5 .5]; epochRej=[-.5 .5];
+%                 elseif m==5; binName='202'; epochName='FIX_GLOBAL';epochSize=[0 .5]; epochRej=[0 .5];
+%                 elseif m==6; binName='B1(102)'; epochName='TASK_GLOBAL'; epochSize=[0 .5]; epochRej=[0 .5];  
 %                 end
-            end    
-        end
-    end
-end
+%                 
+%                 % create bin based epochs and do artifact rej (ext. values)
+%                 EEG = pop_loadset([eegFtDir '/' eeg_file '_ft_bl.set']); %Re-Loads the dataset
+%                 EEG = pop_epoch( EEG, {  binName  }, epochSize, 'newname', [sprintf('sj%02d',iSub) 'epochs_' epochName], 'epochinfo', 'yes');
+%                 
+%                 if m<5  % if normal epoching
+%                     EEG = pop_rmbase( EEG, [-100 0]);
+%                 else % if creating peochs for global analysis
+%                     EEG = pop_rmbase(EEG,[]);
+%                 end
+%                 
+%                 % saves each bin epoched dataset separately
+%                 %EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep' epochName '.set'],'filepath',eegEpDir);
+%                 
+%                 % threshold AR
+%                 chans = 1:17;   % 16/17 are mastoids, for now just do P, POz and Oz elects
+%                 minAmp = -75;
+%                 maxAmp = 75;
+%                 minTime = epochRej(1);
+%                 maxTime = epochRej(2);
+%                 
+%                 %%EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,0);    % final zero marks for rej but doesn't rej
+%                 %%pop_summary_AR_eeg_detection(EEG, [cdTmp '/AR_summary_EEGLAB_REGULAR_EPOCHS/' eeg_file '_' epochName '_AR_sum.txt']);  % creates summary
+%                 EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,1);    % final '1' rejects marked trials immediately
+%                 
+%                 % create "rejection matrix" (easy AR total viewing)
+%                 if m==1                
+%                     newRejMatrix.std(i,1) = iSub;
+%                     newRejMatrix.std(i,j+1) = sum(EEG.reject.rejthresh);
+%                     newRejMatrix.stdntrials(i,1) = iSub;
+%                     newRejMatrix.stdntrials(i,j+1) = size(EEG.epoch,2);               
+%                 elseif m==2 
+%                     newRejMatrix.hit(i,1) = iSub;
+%                     newRejMatrix.hit(i,j+1) = sum(EEG.reject.rejthresh);
+%                     newRejMatrix.hitntrials(i,1) = iSub;
+%                     newRejMatrix.hitntrials(i,j+1) = size(EEG.epoch,2); 
+% %                 elseif m==3
+% %                     newRejMatrix.miss(i,1) = iSub;
+% %                     newRejMatrix.miss(i,j+1) = sum(EEG.reject.rejthresh);
+% %                     newRejMatrix.missntrials(i,1) = iSub;
+% %                     newRejMatrix.missntrials(i,j+1) = size(EEG.epoch,2);  
+%                 end  
+%                 save([dataCompiled '/' 'newRejMatrix.mat'],'newRejMatrix');
+%                 
+%                 %% save the epoched datasets
+%                 EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',eegEpDir);
+% 
+% %                 if m~=4
+% %                     EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',[cdTmp '/A_REGULAR_EPOCHS/']);
+% %                 elseif m==4
+% %                     EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',[cdTmp '/A_REGULAR_EPOCHS/']);
+% %                     EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',[cdTmp '/A_STUDY_RESP_LOCKED/']);    % save a version in separate folder for separate STUDY
+% %                 end
+%             end    
+%         end
+%     end
+% end
+% 
+% %% generate large (45s) epochs for standards/targets
+% %% Generate regular length epochs
+% for i=1:size(subjectNumbers,2)
+%     iSub = subjectNumbers(i);
+%     dirTmp = [];
+%     dirTmp = dir(sprintf('sj%02d*.cnt',iSub));    % find all the files with that sjNum in the dir and the .cnt file extension
+%     
+%     %% loop through each of the subject files
+%     for j=1:size(dirTmp,1)
+%         eeg_file = dirTmp(j).name;   % pulls out string name
+%         eeg_file = strrep(eeg_file,'.cnt',''); % gets rid of .bdf file extension
+%         if epochDataLong==1
+%             
+%             % loop extracts 3 main types of epoch from each
+%             % subject/condition
+%             for m=1:2
+%                 
+%                 % define names of bins
+%                 if m==1; binName='100'; epochName='TASK';  % task block
+%                 elseif m==2; binName='200'; epochName='FIX';  % fixation block
+%                 end
+%                 
+%                 %Re-Loads the dataset
+%                 EEG = pop_loadset([eegFtDir '/' eeg_file '_ft_bl.set']); %Re-Loads the dataset
+% 
+%                 %%%EEG = pop_loadset([eeg_file '_ft_bl.set']);
+%                 
+%                 % epochs bins
+%                 EEG = pop_epoch( EEG, {  binName  }, [0 45], 'newname', [sprintf('sj%02d',iSub) 'long_epochs_' epochName], 'epochinfo', 'yes');
+%                 
+%                 % removes pre-stim baseline (WHOLE BASELINE LATENCY)
+%                 EEG = pop_rmbase( EEG, [30 44]);
+%                 
+%                 %                     % corrects for blinks using regression (AAR
+%                 %                     % Conventional RLS)
+%                 %                     EEG = pop_crls_regression( EEG, [18 19], 1, 0.9999, 0.01,[]);
+%                 
+%                 %                     % threshold AR - CAN'T DO THIS COZ ALL EPOCHS
+%                 %                     REJECTED BECAUSE THEY'RE SO LONG*
+%                 %                     chans = [7:15 18 19];   % 16/17 are mastoids
+%                 %                     minAmp = -100;
+%                 %                     maxAmp = 100;
+%                 %                     minTime = -.1;
+%                 %                     maxTime = .5;
+%                 %
+%                 %                     EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,0);    % final zero marks for rej but doesn't rej
+%                 %                     pop_summary_AR_eeg_detection(EEG, [cdTmp '/AR_summary_EEGLAB_LONG_EPOCHS/' eeg_file '_' epochName '_AR_sum.txt']);  % creates summary
+%                 %                     EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,1);    % final '1' rejects
+%                 
+%                 % saves each bin epoched dataset separately
+%                 EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',eegEpLongDir);
+%                 
+%             end
+%         end
+%     end
+% end
+% 
+% %% Generate 90s data for Hilbert Transform
+% for i=1:size(subjectNumbers,2)
+%     iSub = subjectNumbers(i);
+%     dirTmp = [];
+%     dirTmp = dir(sprintf('sj%02d*.cnt',iSub));    % find all the files with that sjNum in the dir and the .cnt file extension
+%     
+%     %% loop through each of the subject files
+%     for j=1:size(dirTmp,1)
+%         eeg_file = dirTmp(j).name;   % pulls out string name
+%         eeg_file = strrep(eeg_file,'.cnt',''); % gets rid of .bdf file extension
+%         if epochData90s==1
+%             
+%             % loop extracts 3 main types of epoch from each
+%             % subject/condition
+%             for m=2
+%                 
+%                 %define names of bins
+%                 if m==1; binName='300'; epochName='TASK';  % task block * was 100 originally
+%                 elseif m==2; binName='200'; epochName='FIX_TASK';  % fixation block  
+%                 end
+%                 
+%                 %Re-Loads the dataset
+%                 EEG = pop_loadset([eegFtDir '/' eeg_file '_ft_bl.set']); %Re-Loads the dataset
+% 
+%                 % FIX event code latency so that we are actually
+%                 % epoching from the FIRST flickering stimulus, not the
+%                 % 100 that signals the start of the block.
+%                 for i=1:length(EEG.event)                 
+%                     if strcmp(EEG.event(i).type,'100')   % if event code is '100'
+%                         EEG.event(i+1).type = '300'; % label i+1 event as '300' (this is the real start of the flickering)
+%                     end            
+%                 end
+%                 
+%                 % do 90 s epochs
+%                 EEG = pop_epoch( EEG, {  binName  }, [0 90], 'newname', [sprintf('sj%02d',iSub) 'long_epochs_' epochName], 'epochinfo', 'yes');
+%                 
+%                 % remove whole baseline
+%                 EEG = pop_rmbase( EEG, []);
+%                 
+%                 
+%                 %                     % corrects for blinks using regression (AAR
+%                 %                     % Conventional RLS)
+%                 %                     EEG = pop_crls_regression( EEG, [18 19], 1, 0.9999, 0.01,[]);
+%                 
+%                 %                     % threshold AR - CAN'T DO THIS COZ ALL EPOCHS
+%                 %                     REJECTED BECAUSE THEY'RE SO LONG*
+%                 %                     chans = [7:15 18 19];   % 16/17 are mastoids
+%                 %                     minAmp = -100;
+%                 %                     maxAmp = 100;
+%                 %                     minTime = -.1;
+%                 %                     maxTime = .5;
+%                 %
+%                 %                     EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,0);    % final zero marks for rej but doesn't rej
+%                 %                     pop_summary_AR_eeg_detection(EEG, [cdTmp '/AR_summary_EEGLAB_LONG_EPOCHS/' eeg_file '_' epochName '_AR_sum.txt']);  % creates summary
+%                 %                     EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,1);    % final '1' rejects
+%                 
+%                 % saves each bin epoched dataset separately
+%                 EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',eegEpLongDir);
+%                 
+%             end
+%         end
+%     end
+% end
+% 
+% clear 
+% close all
+% 
 
-%% generate large (45s) epochs for standards/targets
-%% Generate regular length epochs
-for i=1:size(subjectNumbers,2)
-    iSub = subjectNumbers(i);
-    dirTmp = [];
-    dirTmp = dir(sprintf('sj%02d*.cnt',iSub));    % find all the files with that sjNum in the dir and the .cnt file extension
-    
-    %% loop through each of the subject files
-    for j=1:size(dirTmp,1)
-        eeg_file = dirTmp(j).name;   % pulls out string name
-        eeg_file = strrep(eeg_file,'.cnt',''); % gets rid of .bdf file extension
-        if epochDataLong==1
-            
-            % loop extracts 3 main types of epoch from each
-            % subject/condition
-            for m=1:2
-                
-                % define names of bins
-                if m==1; binName='100'; epochName='TASK';  % task block
-                elseif m==2; binName='200'; epochName='FIX';  % fixation block
-                end
-                
-                %Re-Loads the dataset
-                EEG = pop_loadset([eegFtDir '/' eeg_file '_ft_bl.set']); %Re-Loads the dataset
-
-                %%%EEG = pop_loadset([eeg_file '_ft_bl.set']);
-                
-                % epochs bins
-                EEG = pop_epoch( EEG, {  binName  }, [0 45], 'newname', [sprintf('sj%02d',iSub) 'long_epochs_' epochName], 'epochinfo', 'yes');
-                
-                % removes pre-stim baseline (WHOLE BASELINE LATENCY)
-                EEG = pop_rmbase( EEG, [30 44]);
-                
-                %                     % corrects for blinks using regression (AAR
-                %                     % Conventional RLS)
-                %                     EEG = pop_crls_regression( EEG, [18 19], 1, 0.9999, 0.01,[]);
-                
-                %                     % threshold AR - CAN'T DO THIS COZ ALL EPOCHS
-                %                     REJECTED BECAUSE THEY'RE SO LONG*
-                %                     chans = [7:15 18 19];   % 16/17 are mastoids
-                %                     minAmp = -100;
-                %                     maxAmp = 100;
-                %                     minTime = -.1;
-                %                     maxTime = .5;
-                %
-                %                     EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,0);    % final zero marks for rej but doesn't rej
-                %                     pop_summary_AR_eeg_detection(EEG, [cdTmp '/AR_summary_EEGLAB_LONG_EPOCHS/' eeg_file '_' epochName '_AR_sum.txt']);  % creates summary
-                %                     EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,1);    % final '1' rejects
-                
-                % saves each bin epoched dataset separately
-                EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',eegEpLongDir);
-                
-            end
-        end
-    end
-end
-
-%% Generate 90s data for Hilbert Transform
-for i=1:size(subjectNumbers,2)
-    iSub = subjectNumbers(i);
-    dirTmp = [];
-    dirTmp = dir(sprintf('sj%02d*.cnt',iSub));    % find all the files with that sjNum in the dir and the .cnt file extension
-    
-    %% loop through each of the subject files
-    for j=1:size(dirTmp,1)
-        eeg_file = dirTmp(j).name;   % pulls out string name
-        eeg_file = strrep(eeg_file,'.cnt',''); % gets rid of .bdf file extension
-        if epochData90s==1
-            
-            % loop extracts 3 main types of epoch from each
-            % subject/condition
-            for m=2
-                
-                %define names of bins
-                if m==1; binName='300'; epochName='TASK';  % task block * was 100 originally
-                elseif m==2; binName='200'; epochName='FIX_TASK';  % fixation block  
-                end
-                
-                %Re-Loads the dataset
-                EEG = pop_loadset([eegFtDir '/' eeg_file '_ft_bl.set']); %Re-Loads the dataset
-
-                % FIX event code latency so that we are actually
-                % epoching from the FIRST flickering stimulus, not the
-                % 100 that signals the start of the block.
-                for i=1:length(EEG.event)                 
-                    if strcmp(EEG.event(i).type,'100')   % if event code is '100'
-                        EEG.event(i+1).type = '300'; % label i+1 event as '300' (this is the real start of the flickering)
-                    end            
-                end
-                
-                % do 90 s epochs
-                EEG = pop_epoch( EEG, {  binName  }, [0 90], 'newname', [sprintf('sj%02d',iSub) 'long_epochs_' epochName], 'epochinfo', 'yes');
-                
-                % remove whole baseline
-                EEG = pop_rmbase( EEG, []);
-                
-                
-                %                     % corrects for blinks using regression (AAR
-                %                     % Conventional RLS)
-                %                     EEG = pop_crls_regression( EEG, [18 19], 1, 0.9999, 0.01,[]);
-                
-                %                     % threshold AR - CAN'T DO THIS COZ ALL EPOCHS
-                %                     REJECTED BECAUSE THEY'RE SO LONG*
-                %                     chans = [7:15 18 19];   % 16/17 are mastoids
-                %                     minAmp = -100;
-                %                     maxAmp = 100;
-                %                     minTime = -.1;
-                %                     maxTime = .5;
-                %
-                %                     EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,0);    % final zero marks for rej but doesn't rej
-                %                     pop_summary_AR_eeg_detection(EEG, [cdTmp '/AR_summary_EEGLAB_LONG_EPOCHS/' eeg_file '_' epochName '_AR_sum.txt']);  % creates summary
-                %                     EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,1);    % final '1' rejects
-                
-                % saves each bin epoched dataset separately
-                EEG = pop_saveset(EEG, 'filename', ['x' eeg_file '_ft_bl_ep_ar_' epochName '.set'],'filepath',eegEpLongDir);
-                
-            end
-        end
-    end
-end
-
-clear all
-close all
-
-
-
+%%%%%%%%%%%%%%%%%%%%%%% tom comment on 062420 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 

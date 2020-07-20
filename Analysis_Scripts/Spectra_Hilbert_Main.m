@@ -17,7 +17,7 @@ destDir = '/home/bullock/CBF_Attention/Data_Compiled';
 
 %psList = [134 237  576 577 578 592 588 350];
 %psList = [134 576 577 578 592 237 350 588]; % matches bloodflow order 
-subjects = 249;
+subjects = [134 576 577  592 237 350 588 249 997 998 999]; % matches bloodflow order (skipped 578)
 
 % loop through subs
 for iSub=1:length(subjects)
@@ -99,14 +99,8 @@ plot(downsampledHilbert(2,:),'r') % hypercap
 plot(downsampledHilbert(3,:),'b') % hypocap
 plot(downsampledHilbert(4,:),'m') % hypoxia
 
-ylim([0,100])
+%ylim([0,100])
 ylabel('alpha power')
 xlabel('secs')
 
 legend('air','hcap','hpo','hpox')
-
-
-
-
-        
-        

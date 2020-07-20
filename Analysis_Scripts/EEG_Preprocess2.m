@@ -15,7 +15,7 @@ close all
 cd /home/bullock/CBF_Attention/Analysis_Scripts
 
 %subjectNumbers = [134,237,350,576,577,578,588,592]; %pre2019
-subjects = 249;
+subjects = [134,237,350,576,577,578,588,592,249,997:999];
 
 % set dirs (remove redundant ones)
 analysisDir = '/home/bullock/CBF_Attention/Analysis_Scripts';
@@ -37,6 +37,8 @@ for iSub=1:length(subjects)
         elseif  j==4; thisCond='hypoxia';
         elseif  j==5; thisCond='hyperair';
         end
+        
+        try
         
         % load data
         load([eegFtDir '/' sprintf('sj%d_',sjNum) thisCond '_ft.mat'])
@@ -61,7 +63,11 @@ for iSub=1:length(subjects)
         clear EEG_ERP_std EEG_ERP_tar_hit EEG_ERP_tar_miss
         EEG_ERP_std = pop_epoch(EEG,{'B1(102)'},[-1,2]);
         EEG_ERP_tar_hit = pop_epoch(EEG,{'B2(101)'},[-1,3]);
-        EEG_ERP_tar_miss = pop_epoch(EEG,{'B3(101)'},[-1,3]);
+        try
+            EEG_ERP_tar_miss = pop_epoch(EEG,{'B3(101)'},[-1,3]);
+        catch
+            disp('NO MISS TRIALS!')
+        end
         EEG_90sec = pop_epoch(EEG,{'200'},[1,89]); % 90 sec x6  fix>task cycle [going out 0,90 means epochs geet cut out]
         EEG_45sec_task = pop_epoch(EEG,{'100'},[1,44]); % 45 sec task 
         EEG_45sec_fix = pop_epoch(EEG,{'200'},[1,44]); % 45 sec fix
@@ -71,8 +77,15 @@ for iSub=1:length(subjects)
         % process script)
         
         
+        % add subject exception for sj578
+        if sjNum==578
+            theseAnalyses = [1,2,4:6];
+        else
+            theseAnalyses = 1:6;
+        end
+        
         % remove baseline if needed and save data
-        for iEpoch = 1:6
+        for iEpoch = theseAnalyses;
             clear EEG
             if      iEpoch==1; EEG = EEG_ERP_std; thisBaseline = [-100,0]; epochType = 'erp_std';
             elseif  iEpoch==2; EEG = EEG_ERP_tar_hit; thisBaseline = [-100,0]; epochType = 'erp_tar_hit';
@@ -86,6 +99,10 @@ for iSub=1:length(subjects)
             
             save([eegEpTaskDir '/' sprintf('sj%d_',sjNum) thisCond '_' epochType '_ft_ep.mat'],'EEG')
             
+        end
+        
+        catch
+            disp(['Skipping sj ' num2str(sjNum) ' cond ' thisCond])  
         end
         
     end
@@ -160,8 +177,8 @@ close all
 %     end
 % end
 
-%Draw the data.(adhoc)
-eegplot(EEG.data,...
-    'eloc_file',EEG.chanlocs, ...
-    'srate',EEG.srate,...
-    'events',EEG.event);
+% %Draw the data.(adhoc)
+% eegplot(EEG.data,...
+%     'eloc_file',EEG.chanlocs, ...
+%     'srate',EEG.srate,...
+%     'events',EEG.event);
