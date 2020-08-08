@@ -25,7 +25,7 @@ load([sourceDir '/' 'BBT_Master.mat'])
 
 % set up figure
 h=figure('Units','normalized','Position',[0,0,.4,1]);
-h.Renderer = 'pain
+h.Renderer = 'painters';
 
 % generate plots for MCA and PCA separately
 subplot(3,1,1);
@@ -55,6 +55,7 @@ set(gca,'LineWidth',1.5,...
     'yLim',[30,80]);
 pbaspect([3,1,1]);
 line([45,45],[30,80],'linestyle','--','color','k','linewidth',2);
+set(gcg
 
 subplot(3,1,2)
 for iPlot=1:4
@@ -119,4 +120,5 @@ pbaspect([3,1,1]);
 line([45,45],[2,7],'linestyle','--','color','k','linewidth',2);
 
 % save figure
+saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots.eps'],'epsc')
 saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots.eps'],'epsc')
