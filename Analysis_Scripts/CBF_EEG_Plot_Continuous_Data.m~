@@ -55,7 +55,7 @@ set(gca,'LineWidth',1.5,...
     'yLim',[30,80]);
 pbaspect([3,1,1]);
 line([45,45],[30,80],'linestyle','--','color','k','linewidth',2);
-set(gcg
+%set(gcf,'Renderer','painters');
 
 subplot(3,1,2)
 for iPlot=1:4
@@ -84,6 +84,7 @@ set(gca,'LineWidth',1.5,...
     'yLim',[20,60]);
 pbaspect([3,1,1]);
 line([45,45],[20,60],'linestyle','--','color','k','linewidth',2);
+%set(gcf,'Renderer','painters');
 
 
 % load Alpha Power data
@@ -118,7 +119,8 @@ set(gca,'LineWidth',1.5,...
     'yLim',[2,7]);
 pbaspect([3,1,1]);
 line([45,45],[2,7],'linestyle','--','color','k','linewidth',2);
+%set(gcf,'Renderer','painters');
 
 % save figure
 saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots.eps'],'epsc')
-saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots.eps'],'epsc')
+saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots.tiff'],'tiff')

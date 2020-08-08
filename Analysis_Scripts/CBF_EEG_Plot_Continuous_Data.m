@@ -124,3 +124,4 @@ line([45,45],[2,7],'linestyle','--','color','k','linewidth',2);
 % save figure
 saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots.eps'],'epsc')
 saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots.tiff'],'tiff')
+saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots.jpeg'],'jpeg')
