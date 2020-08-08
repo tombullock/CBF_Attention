@@ -17,7 +17,7 @@ destDir = '/home/bullock/CBF_Attention/Data_Compiled';
 
 %psList = [134 237  576 577 578 592 588 350];
 %psList = [134 576 577 578 592 237 350 588]; % matches bloodflow order 
-subjects = [134 576 577  592 237 350 588 249 997 998 999]; % matches bloodflow order (skipped 578)
+subjects = [134 576 577 578 592 237 350 588 249 997 998 999]; % matches bloodflow order (skipped 578)
 
 % loop through subs
 for iSub=1:length(subjects)
@@ -43,27 +43,27 @@ for iSub=1:length(subjects)
         % load 90 s epoch data
         load([sourceDir '/' sprintf('sj%d_',sjNum) thisCond '_fixTask90_ft_ep.mat'])
         
-        % apply eegfiltnew (original filter in manuscript)
-        tempEEG = pop_eegfiltnew(EEG,8,12);
-        tempEEG = EEG.data;
+%         % apply eegfiltnew (original filter in manuscript)
+%         tempEEG = pop_eegfiltnew(EEG,8,12);
+%         tempEEG = EEG.data;
         
-%         % apply Butterworth Filter (better alternative to try)
-%         filterorder = 3;
-%         type = 'bandpass';
-%         [z1,p1] = butter(filterorder, [8,12]./(EEG.srate/2),type);
-%         data = double(EEG.data);
-%         tempEEG = NaN(size(data,1),EEG.pnts,size(data,3));
-%         for x = 1:size(data,1) % loop through chans
-%             for y = 1:size(data,3) % loop through trials
-%                 dataFilt1 = filtfilt(z1,p1,data(x,:,y)); % was filtfilt
-%                 tempEEG(x,:,y) = dataFilt1; % tymp = chans x times x trials
-%             end
-%         end
+        % apply Butterworth Filter (better alternative to try)
+        filterorder = 3;
+        type = 'bandpass';
+        [z1,p1] = butter(filterorder, [8,12]./(EEG.srate/2),type);
+        data = double(EEG.data);
+        tempEEG = NaN(size(data,1),EEG.pnts,size(data,3));
+        for x = 1:size(data,1) % loop through chans
+            for y = 1:size(data,3) % loop through trials
+                dataFilt1 = filtfilt(z1,p1,data(x,:,y)); % was filtfilt
+                tempEEG(x,:,y) = dataFilt1; % tymp = chans x times x trials
+            end
+        end
         
-%         eegBand = [];
-%         eegBand = tempEEG;
-%         
-%         
+        eegBand = [];
+        eegBand = tempEEG;
+        
+        
         
         % apply Hilbert to each channel and trial
         hilberEEG = [];

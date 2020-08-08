@@ -53,4 +53,11 @@ For EERPs (targs) same (INC 350, EXC 321 581)
 
 `EEG_Preprocess1.m` Re-ref,filt, artifact correct (AAR) -channel rej???
 
-`EEG_Preprocess2.m` Epoch, artifact reject (threshold, for task only)
+`EEG_Preprocess2.m` Epoch, artifact reject (threshold, for task only) << CHECK THIS, NOT CURRENTLY IMPLEMENTED!
+
+## NOTES ON PROGRESS
+
+Redone behavior plots with new subjects (Figure 2)
+
+Look on local machine Calgary_Data/Paper/Stats/Stats_for_paper_june 2018 for useful scripts etc (and elsewhere in that dir)
+

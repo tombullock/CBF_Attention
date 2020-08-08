@@ -16,6 +16,7 @@ close all
 %thisDir = '/home/bullock/Calgary/Data_Task/A_Epochs_45';
 thisDir = '/home/bullock/CBF_Attention/EEG_Ep_Task';
 plotDir = '/home/bullock/CBF_Attention/Plots';
+compiledDir = '/home/bullock/CBF_Attention/Data_Compiled';
 
 %subjects = [134 237 350 576 577 588 592];
 subjects = [134,237,350,576,577,588,592,249,997:999]; % no 578 coz missing resps
@@ -119,6 +120,9 @@ pbaspect([1,1,1])
 
 % save figure
 saveas(h,[plotDir '/' 'Behavior_Acc.eps'],'epsc')
+
+% save bar accuracy matrix
+save([compiledDir '/' 'BEH_Acc_Master.mat'],'barAccMat','subjects')
 
 
 % for plotting across blocks (not needed)
