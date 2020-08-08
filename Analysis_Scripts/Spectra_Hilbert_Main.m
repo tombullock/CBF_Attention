@@ -16,8 +16,9 @@ sourceDir = '/home/bullock/CBF_Attention/EEG_Ep_Task';
 destDir = '/home/bullock/CBF_Attention/Data_Compiled';
 
 %psList = [134 237  576 577 578 592 588 350];
-%psList = [134 576 577 578 592 237 350 588]; % matches bloodflow order 
-subjects = [134 576 577 578 592 237 350 588 249 997 998 999]; % matches bloodflow order (skipped 578)
+%psList = [134 576 577 578 592 237 350 588]; % matches OLD bloodflow order 
+
+subjects = [134,350,576,577,578,592,237,588,249,998,997,999]; % matches new bloodflow order (08.07.20)
 
 % loop through subs
 for iSub=1:length(subjects)
@@ -74,8 +75,8 @@ for iSub=1:length(subjects)
         end
         
         % convert to amp or power
-        hilbertEEG = [abs(hilbertEEG)];
-        disp('Calculating Amplitude!')
+        hilbertEEG = [abs(hilbertEEG).^2];
+        disp('Calculating Power!')
         
         %average over electrodes and epochs
         allHilbert(iSub,iCond,:) = mean(mean(hilbertEEG(10:15,:,:),1),3); % do 10:15 for average of all O and PO elects
@@ -89,7 +90,7 @@ for i=1:88 % 88 points coz lost edges!
     downsampledHilbert(:,:,i) = mean(allHilbert(:,:,(j-249):j),3);  
 end
 
-save([destDir '/' 'Hilbert_Alpha_Master.mat'],'downsampledHilbert');
+save([destDir '/' 'Hilbert_Alpha_Master.mat'],'downsampledHilbert','subjects');
 
 % quick plot averaged across conditons
 
