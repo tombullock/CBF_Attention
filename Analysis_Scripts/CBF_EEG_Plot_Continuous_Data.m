@@ -25,6 +25,7 @@ load([sourceDir '/' 'BBT_Master.mat'])
 
 % set up figure
 h=figure('Units','normalized','Position',[0,0,.4,1]);
+h.Renderer = 'painters';
 
 % generate plots for MCA and PCA separately
 subplot(3,1,1);

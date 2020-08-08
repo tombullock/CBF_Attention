@@ -12,6 +12,7 @@ close
 
 % set dirs
 sourceDir = '/home/bullock/CBF_Attention/Data_Compiled';
+destDir = '/home/bullock/CBF_Attention/Plots';
 
 % define colors for lines
 thisGreen = [0 100 0];
@@ -21,6 +22,10 @@ thisMagenta = [153 50 204];
 
 % load CBF data
 load([sourceDir '/' 'BBT_Master.mat'])
+
+% set up figure
+h=figure('Units','normalized','Position',[0,0,.4,1]);
+h.Renderer = 'pain
 
 % generate plots for MCA and PCA separately
 subplot(3,1,1);
@@ -49,7 +54,7 @@ set(gca,'LineWidth',1.5,...
     'yTick',30:10:80,...
     'yLim',[30,80]);
 pbaspect([3,1,1]);
-line([45,
+line([45,45],[30,80],'linestyle','--','color','k','linewidth',2);
 
 subplot(3,1,2)
 for iPlot=1:4
@@ -68,6 +73,16 @@ for iPlot=1:4
     clear thisMean thisSEM theseData
 
 end
+
+set(gca,'LineWidth',1.5,...
+    'FontSize',20,...
+    'Box','off',...
+    'xTick',0:10:90,...
+    'xLim',[0,90],...
+    'yTick',20:10:60,...
+    'yLim',[20,60]);
+pbaspect([3,1,1]);
+line([45,45],[20,60],'linestyle','--','color','k','linewidth',2);
 
 
 % load Alpha Power data
@@ -93,5 +108,15 @@ for iPlot=1:4
     
 end
 
+set(gca,'LineWidth',1.5,...
+    'FontSize',20,...
+    'Box','off',...
+    'xTick',0:10:90,...
+    'xLim',[0,90],...
+    'yTick',2:7,...
+    'yLim',[2,7]);
+pbaspect([3,1,1]);
+line([45,45],[2,7],'linestyle','--','color','k','linewidth',2);
 
-
+% save figure
+saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots.eps'],'epsc')
