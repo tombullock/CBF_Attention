@@ -55,9 +55,26 @@ For EERPs (targs) same (INC 350, EXC 321 581)
 
 `EEG_Preprocess2.m` Epoch, artifact reject (threshold, for task only) << CHECK THIS, NOT CURRENTLY IMPLEMENTED!
 
+`CBF_Plot_Avg_Data.m` Generate CBF/CVC plots for Figure 5
+
+
+*** need to add new scripts ***
+
 ## NOTES ON PROGRESS
 
 Redone behavior plots with new subjects (Figure 2)
+
+Redone figure 3 (just using Andrew's fig for now)
+
+Redone figure 4 with updated subs (08.07.20)
+
+Redone figure 5 with updated subs (08.12.20)!
+
+*********************HEREH**************
+
+
+
+
 
 Look on local machine Calgary_Data/Paper/Stats/Stats_for_paper_june 2018 for useful scripts etc (and elsewhere in that dir)
 

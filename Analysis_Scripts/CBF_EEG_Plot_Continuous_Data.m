@@ -5,6 +5,8 @@ Date: 08.07.20
 
 Create plot for Figure 4 of MS
 
+Note - need to account for sj999 missing data in one condition (
+
 %}
 
 clear
@@ -25,7 +27,7 @@ load([sourceDir '/' 'BBT_Master.mat'])
 
 % set up figure
 h=figure('Units','normalized','Position',[0,0,.4,1]);
-h.Renderer = 'painters';
+%h.Renderer = 'painters';
 
 % generate plots for MCA and PCA separately
 subplot(3,1,1);
