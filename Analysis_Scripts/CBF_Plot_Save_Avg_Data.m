@@ -107,12 +107,12 @@ for iPlot=1:6
     subplot(2,3,iPlot)
     
     data = [];
-    if iPlot==1; data = mean_MCAv; this_yLim = [30,100];
-    elseif iPlot==2; data = mean_PCAv; this_yLim = [10,80];
-    elseif iPlot==3; data = mean_pc_CBFv_PCA_MCA; this_yLim = [-5,22];
-    elseif iPlot==4; data = mean_MCA_CVC; this_yLim = [.1,1.1];
-    elseif iPlot==5; data = mean_PCA_CVC; this_yLim = [.1,1.1];
-    elseif iPlot==6; data = mean_pc_CVC_PCA_MCA; this_yLim = [-5,25];
+    if iPlot==1; data = mean_MCAv; this_yLim = [30,80]; %[30,100];
+    elseif iPlot==2; data = mean_PCAv; this_yLim = [20,60]; %[10,80];
+    elseif iPlot==3; data = mean_pc_CBFv_PCA_MCA; this_yLim = [0,12];% [-5,22];
+    elseif iPlot==4; data = mean_MCA_CVC; this_yLim = [.4,.9];% [.1,1.1];
+    elseif iPlot==5; data = mean_PCA_CVC; this_yLim = [.2,.6];% [.1,1.1];
+    elseif iPlot==6; data = mean_pc_CVC_PCA_MCA; this_yLim = [-2,10];% [-5,25];
     end
     
     % define colors for lines
@@ -132,9 +132,9 @@ for iPlot=1:6
         bar(i,mean(data(:,i),1), 'FaceColor',thisColor./255); hold on
     end
     
-    % plot individual data points using plotSpread
-    plotSpread(data,'distributionMarkers',{'.'},'distributionColors',{'k'});
-    set(findall(1,'type','line','color','k'),'markerSize',16) %Change marker size
+%     % plot individual data points using plotSpread
+%     plotSpread(data,'distributionMarkers',{'.'},'distributionColors',{'k'});
+%     set(findall(1,'type','line','color','k'),'markerSize',16) %Change marker size
     
     % plot error bars
     errorbar(1.25:1:8.25,mean(data,1),std(data,0,1)/sqrt(size(data,1)),...

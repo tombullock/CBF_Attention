@@ -135,7 +135,7 @@ for iPhase=1:2
             'LineWidth',1.5,...
             'xticklabels',{' ',' ',' ',' '},...
             'xtick',[],...
-            'ylim',[0 .35],....
+            'ylim',[0 .5],....
             'box','off');
         
         pbaspect([1,1,1])
@@ -143,10 +143,10 @@ for iPhase=1:2
     end
 end
 
-% % plot individual data points using plotSpread
-% plotSpread(dataForPlotSpread,'distributionMarkers',{'.'},'distributionColors',{'k'});
-% set(findall(h3,'type','line','color','k'),'markerSize',16) %Change marker size
-% clear dataForPlotSpread
+% plot individual data points using plotSpread
+plotSpread(dataForPlotSpread,'distributionMarkers',{'.'},'distributionColors',{'k'});
+set(findall(h3,'type','line','color','k'),'markerSize',16) %Change marker size
+clear dataForPlotSpread
 
 % save
 saveas(h3,[destDir '/' 'EEG_Bars_Alpha.eps'],'epsc');
@@ -226,16 +226,16 @@ for iPlot=1:4
         'LineWidth',1.5,...
         'xticklabels',{' ',' ',' ',' '},...
         'xtick',[],...
-        'ylim',[0 1],....
+        'ylim',[0 1.1],....
         'box','off');
     
     pbaspect([1,1,1])
     
 end
 
-% % plot individual data points using plotSpread
-% plotSpread(dataForPlotSpread,'distributionMarkers',{'.'},'distributionColors',{'k'});
-% set(findall(h5,'type','line','color','k'),'markerSize',16) %Change marker size
+% plot individual data points using plotSpread
+plotSpread(dataForPlotSpread,'distributionMarkers',{'.'},'distributionColors',{'k'});
+set(findall(h5,'type','line','color','k'),'markerSize',16) %Change marker size
 
 % save
 saveas(h5,[destDir '/' 'EEG_Bars_SSVEP.eps'],'epsc');
