@@ -30,7 +30,7 @@ load([sourceDir '/' 'BBT_CVC_Updated_Dec_2020.mat'])
 
 
 % set up figure
-h=figure('Units','normalized','Position',[0,0,1,1]);
+h=figure('Units','normalized','Position',[0    0.0301    0.7496    0.8970]);
 %h.Renderer = 'painters';
 
 
@@ -72,7 +72,7 @@ mean_CBFv_MCA = ((mean_MCAv(:,[2,4,6,8]) - mean_MCAv(:,[1,3,5,7]))./mean_MCAv(:,
 mean_CBFv_PCA = ((mean_PCAv(:,[2,4,6,8]) - mean_PCAv(:,[1,3,5,7]))./mean_PCAv(:,[1,3,5,7]))*100; 
 
 % combine into one mat for plotting
-mean_CBFv_PCA_MCA = [
+mean_pc_CBFv_PCA_MCA = [
     mean_CBFv_PCA(:,1), mean_CBFv_MCA(:,1),...
     mean_CBFv_PCA(:,2), mean_CBFv_MCA(:,2),...
     mean_CBFv_PCA(:,3), mean_CBFv_MCA(:,3),...
@@ -109,7 +109,7 @@ for iPlot=1:6
     data = [];
     if iPlot==1; data = mean_MCAv; this_yLim = [30,100];
     elseif iPlot==2; data = mean_PCAv; this_yLim = [10,80];
-    elseif iPlot==3; data = mean_CBFv_PCA_MCA; this_yLim = [-5,22];
+    elseif iPlot==3; data = mean_pc_CBFv_PCA_MCA; this_yLim = [-5,22];
     elseif iPlot==4; data = mean_MCA_CVC; this_yLim = [.1,1.1];
     elseif iPlot==5; data = mean_PCA_CVC; this_yLim = [.1,1.1];
     elseif iPlot==6; data = mean_pc_CVC_PCA_MCA; this_yLim = [-5,25];
@@ -153,74 +153,10 @@ for iPlot=1:6
     
 end
 
+% save averaged BBT data
+save(['/home/bullock/CBF_Attention/Data_Compiled' '/' 'BBT_Master_Averaged_Data.mat'],'mean_MCAv','mean_PCAv','mean_pc_CBFv_PCA_MCA','mean_MCA_CVC','mean_PCA_CVC','mean_pc_CVC_PCA_MCA')
 
-% 
-% 
-% 
-% %% plot MCA/PCA % change
-% for iPlot=3
-%     
-%     subplot(2,3,iPlot)
-%     data = [];
-%     data = [
-%         mean_CBFv_PCA(:,1), mean_CBFv_MCA(:,1),...
-%         mean_CBFv_PCA(:,2), mean_CBFv_MCA(:,2),...
-%         mean_CBFv_PCA(:,3), mean_CBFv_MCA(:,3),...
-%         mean_CBFv_PCA(:,4), mean_CBFv_MCA(:,4)];
-%     
-%     
-%     
-%     % define colors for lines
-%     thisGreen = [0 100 0];
-%     thisRed = [255 0 0 ];
-%     thisBlue = [30 144 255];
-%     thisMagenta = [153 50 204];
-%     
-%     % plot bars
-%     for i=1:8
-%         if i==1||i==2; thisColor = thisGreen;
-%         elseif i==3||i==4; thisColor = thisRed;
-%         elseif i==5||i==6; thisColor = thisBlue;
-%         elseif i==7||i==8; thisColor = thisMagenta;
-%         end
-%         
-%         bar(i,mean(data(:,i),1), 'FaceColor',thisColor./255); hold on
-%     end
-%     
-%     % plot individual data points using plotSpread
-%     plotSpread(data,'distributionMarkers',{'.'},'distributionColors',{'k'});
-%     set(findall(1,'type','line','color','k'),'markerSize',16) %Change marker size
-%     
-%     % plot error bars
-%     errorbar(1.25:1:8.25,mean(data,1),std(data,0,1)/sqrt(size(data,1)),...
-%         'Color','k','LineStyle','none','LineWidth',2.5,'CapSize',10); %
-%     
-%     % edit plot characteristics
-%     set(gca,'FontSize',24,...
-%         'xlim',[.5,8.5],...
-%         'LineWidth',1.5,...
-%         'xticklabels',{' ',' ',' ',' '},...
-%         'xtick',[],...
-%         'ylim',this_yLim,...
-%         'box','off');
-%     
-%     pbaspect([1,1,1])
-%     
-% end
-% 
-% 
-% 
-% 
-% 
+% save fig
+saveas(h,['/home/bullock/CBF_Attention/Plots' '/' 'CBF_Mean_Plots.eps'],'epsc')
 
-% 
-% 
-% % save figure
-% saveas(h,[plotDir '/' 'Behavior_Acc.eps'],'epsc')
-% 
-% % save bar accuracy matrix
-% save([compiledDir '/' 'BEH_Acc_Master.mat'],'barAccMat','subjects')
-% 
-% 
-% 
-%
+

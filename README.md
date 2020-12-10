@@ -57,6 +57,12 @@ For EERPs (targs) same (INC 350, EXC 321 581)
 
 `CBF_Plot_Avg_Data.m` Generate CBF/CVC plots for Figure 5
 
+`CBF_Stats.m` Run all resampled stats on CBF data
+
+`CBF_Stats_PCAcvc_Averaged_Only.m` Run resampled stats on averaged PCAcvc data (this was the only analysis that didn't fit the template from previous script!)
+
+`EEG_Analyze_Plot_Spectra.m` Generate plots for Figure 6
+
 
 *** need to add new scripts ***
 
@@ -69,6 +75,10 @@ Redone figure 3 (just using Andrew's fig for now)
 Redone figure 4 with updated subs (08.07.20)
 
 Redone figure 5 with updated subs (08.12.20)!
+
+Redone stats for Section 4.1.3 (Figure 5) on 09.12.20!
+
+EEG next...
 
 *********************HEREH**************
 
