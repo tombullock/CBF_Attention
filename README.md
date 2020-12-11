@@ -63,6 +63,8 @@ For EERPs (targs) same (INC 350, EXC 321 581)
 
 `EEG_Analyze_Plot_Spectra.m` Generate plots for Figure 6
 
+`CBF_EEG_Regression.m` Regress PCA and MCA against the Alpha (Hilbert) signal and plot
+
 
 *** need to add new scripts ***
 
