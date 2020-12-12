@@ -59,12 +59,12 @@ for iSub=1:length(subjects)
             
         EEG = pop_overwritevent( EEG, 'binlabel'); 
         
-        % epoch data for various analyses (NEED ADJUSTING FOR ERSPS - SEE OLD EEG_PROCESS1 SCRIPT COMMENTED)
+        % epoch data for various analyses 
         clear EEG_ERP_std EEG_ERP_tar_hit EEG_ERP_tar_miss
-        EEG_ERP_std = pop_epoch(EEG,{'B1(102)'},[-1,2]);
-        EEG_ERP_tar_hit = pop_epoch(EEG,{'B2(101)'},[-1,3]);
+        EEG_ERP_std = pop_epoch(EEG,{'B1(102)'},[-1,2]); % for ERP/ERSP [EPOCH SIZE WAS ORIG [-1 3]]
+        EEG_ERP_tar_hit = pop_epoch(EEG,{'B2(101)'},[-1,2]); % for ERP/ERSP [EPOCH SIZE WAS ORIG [-1 3]]
         try
-            EEG_ERP_tar_miss = pop_epoch(EEG,{'B3(101)'},[-1,3]);
+            EEG_ERP_tar_miss = pop_epoch(EEG,{'B3(101)'},[-1,2]); % for ERP/ERSP
         catch
             disp('NO MISS TRIALS!')
         end
@@ -75,6 +75,17 @@ for iSub=1:length(subjects)
         
         % add threshold based art. rejection here if needed! (see prev
         % process script)
+        
+%                 % threshold AR
+%                 chans = 1:17;   % 16/17 are mastoids, for now just do P, POz and Oz elects
+%                 minAmp = -75;
+%                 maxAmp = 75;
+%                 minTime = epochRej(1);
+%                 maxTime = epochRej(2);
+%                 
+%                 %%EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,0);    % final zero marks for rej but doesn't rej
+%                 %%pop_summary_AR_eeg_detection(EEG, [cdTmp '/AR_summary_EEGLAB_REGULAR_EPOCHS/' eeg_file '_' epochName '_AR_sum.txt']);  % creates summary
+%                 EEG = pop_eegthresh(EEG,1,chans,minAmp,maxAmp,minTime,maxTime,0,1);    % final '1' rejects marked trials immediately
         
         
         % add subject exception for sj578
@@ -87,9 +98,9 @@ for iSub=1:length(subjects)
         % remove baseline if needed and save data
         for iEpoch = theseAnalyses;
             clear EEG
-            if      iEpoch==1; EEG = EEG_ERP_std; thisBaseline = [-100,0]; epochType = 'erp_std';
-            elseif  iEpoch==2; EEG = EEG_ERP_tar_hit; thisBaseline = [-100,0]; epochType = 'erp_tar_hit';
-            elseif  iEpoch==3; EEG = EEG_ERP_tar_miss; thisBaseline = [-100,0]; epochType = 'erp_tar_miss';
+            if      iEpoch==1; EEG = EEG_ERP_std; thisBaseline = [-100,0]; epochType = 'erp_std'; artRejWindow = [-.1,.5];
+            elseif  iEpoch==2; EEG = EEG_ERP_tar_hit; thisBaseline = [-100,0]; epochType = 'erp_tar_hit'; artRejWindow = [.4,1.2];
+            elseif  iEpoch==3; EEG = EEG_ERP_tar_miss; thisBaseline = [-100,0]; epochType = 'erp_tar_miss'; artRejWindow = [.4,1.2];
             elseif  iEpoch==4; EEG = EEG_90sec; thisBaseline = []; epochType = 'fixTask90';
             elseif  iEpoch==5; EEG = EEG_45sec_task; thisBaseline = []; epochType = 'task45'; % check this baseline
             elseif  iEpoch==6; EEG = EEG_45sec_fix; thisBaseline = []; epochType = 'fix45'; % check this baseline
@@ -97,7 +108,16 @@ for iSub=1:length(subjects)
             
             EEG = pop_rmbase( EEG, thisBaseline); % remove baseline
             
-            save([eegEpTaskDir '/' sprintf('sj%d_',sjNum) thisCond '_' epochType '_ft_ep.mat'],'EEG')
+            % do threshold based artifact rejection on short epoch data
+            pcRejTrials = [];
+            if ismember(iEpoch,1:3)
+                EEG = pop_eegthresh(EEG,1,1:17,-75,75,artRejWindow(1),artRejWindow(2),0,1);
+                pcRejTrials = (sum(EEG.reject.rejthresh)/length(EEG.reject.rejthresh))*100;
+            end
+            
+            
+            
+            save([eegEpTaskDir '/' sprintf('sj%d_',sjNum) thisCond '_' epochType '_ft_ep.mat'],'EEG','pcRejTrials')
             
         end
         
