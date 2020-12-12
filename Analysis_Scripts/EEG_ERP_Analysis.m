@@ -11,6 +11,7 @@ close all
 % set dirs
 sourceDir = '/home/bullock/CBF_Attention/EEG_Ep_Task';
 destDir = '/home/bullock/CBF_Attention/Data_Compiled';
+destDirPlot = '/home/bullock/CBF_Attention/Plots';
 
 % subjects
 subjects = [134,237,350,576,577,578,588,592,249,997:999];
@@ -176,7 +177,7 @@ for iIter=1:length(pMat)
     
 end
 
-saveas(h1,[destDir '/' 'EEG_ERP_P3.eps'],'epsc');
+saveas(h1,[destDirPlot '/' 'EEG_ERP_P3.eps'],'epsc');
 
 
 
@@ -204,7 +205,7 @@ for iPlot=1:4
     %cbar
 end
 
-saveas(h2,[destDir '/' 'EEG_ERP_P3_Topos.eps'],'epsc');
+saveas(h2,[destDirPlot '/' 'EEG_ERP_P3_Topos.eps'],'epsc');
 
 
 
@@ -216,38 +217,38 @@ saveas(h2,[destDir '/' 'EEG_ERP_P3_Topos.eps'],'epsc');
 
 
 
-
-
-% PLOT STD DATA [From front to back]
-h=figure;
-for iChan=1:4
-    
-    subplot(1,4,iChan)
-    
-    if iChan==1; theseChans=1:3;
-    elseif iChan==2; theseChans=4:6;
-    elseif iChan==3; theseChans=7:9;
-    elseif iChan==4; theseChans=10:15; % COULD GROUP PO with Parietals? LOOK AT TOPOS!
-    end
-    
-    for i=1:4
-        
-        if i==1; thisColor = thisGreen;
-        elseif i==2; thisColor = thisRed;
-        elseif i==3; thisColor = thisBlue;
-        elseif i==4; thisColor = thisMagenta;
-        end
-        
-        %     plot(EEG.times,squeeze(mean(mean(ERP_Tar(:,i,7:9,:),1),3)),'color',thisColor./255);hold on
-        
-        meanData = squeeze(mean(mean(ERP_Std(:,i,theseChans,:),1),3));
-        semData = squeeze(std(mean(ERP_Std(:,i,theseChans,:),3),0,1))./(sqrt(size(ERP_Std,1)));
-        %shadedErrorBar(EEG.times,meanData,semData,{'color',thisColor./255});hold on
-        plot(EEG.times(226:376),meanData(226:376),'color',thisColor./255,'LineWidth',3);hold on
-        
-    end
-    
-end
+% 
+% 
+% % PLOT STD DATA [From front to back]
+% h=figure;
+% for iChan=1:4
+%     
+%     subplot(1,4,iChan)
+%     
+%     if iChan==1; theseChans=1:3;
+%     elseif iChan==2; theseChans=4:6;
+%     elseif iChan==3; theseChans=7:9;
+%     elseif iChan==4; theseChans=10:15; % COULD GROUP PO with Parietals? LOOK AT TOPOS!
+%     end
+%     
+%     for i=1:4
+%         
+%         if i==1; thisColor = thisGreen;
+%         elseif i==2; thisColor = thisRed;
+%         elseif i==3; thisColor = thisBlue;
+%         elseif i==4; thisColor = thisMagenta;
+%         end
+%         
+%         %     plot(EEG.times,squeeze(mean(mean(ERP_Tar(:,i,7:9,:),1),3)),'color',thisColor./255);hold on
+%         
+%         meanData = squeeze(mean(mean(ERP_Std(:,i,theseChans,:),1),3));
+%         semData = squeeze(std(mean(ERP_Std(:,i,theseChans,:),3),0,1))./(sqrt(size(ERP_Std,1)));
+%         %shadedErrorBar(EEG.times,meanData,semData,{'color',thisColor./255});hold on
+%         plot(EEG.times(226:376),meanData(226:376),'color',thisColor./255,'LineWidth',3);hold on
+%         
+%     end
+%     
+% end
 
 
 
