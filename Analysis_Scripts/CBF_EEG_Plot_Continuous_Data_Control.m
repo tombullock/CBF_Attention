@@ -7,6 +7,9 @@ Create plot for Figure 4 of MS
 
 Note - need to account for sj999 missing data in one condition (
 
+Swap shaded error bar plots for regular plots if i can't get them to output
+good.
+
 %}
 
 clear
@@ -28,11 +31,12 @@ thisGray = [128,128,128];
 load([sourceDir '/' 'BBT_Master.mat'])
 
 % set up figure
-h=figure('Units','normalized','Position',[0,0,.4,1]);
+%h=figure('Units','normalized','Position',[0,0,.4,1]);
+h=figure('Position',[676   695   607   307]);
 %h.Renderer = 'painters';
 
 % generate plots for MCA and PCA separately
-subplot(3,1,1);
+%subplot(3,1,1);
 for iPlot=1:2
     
     if  iPlot==1; theseData = MCA_BBT_HYPERAIR_NEW; thisColor = thisGray;
@@ -53,13 +57,17 @@ set(gca,'LineWidth',1.5,...
     'Box','off',...
     'xTick',0:10:90,...
     'xLim',[0,90],...
-    'yTick',30:10:80,...
-    'yLim',[30,80]);
+    'yTick',30:10:70,...
+    'yLim',[30,70]);
 pbaspect([3,1,1]);
-line([45,45],[30,80],'linestyle','--','color','k','linewidth',2);
+line([45,45],[30,70],'linestyle','--','color','k','linewidth',2);
 %set(gcf,'Renderer','painters');
 
-subplot(3,1,2)
+saveas(h,[destDir '/' 'CBF_MCA_Continuous_Plot_Control.jpeg'],'jpeg')
+
+h=figure('Position',[676   695   607   307]);
+
+%subplot(3,1,2)
 for iPlot=1:2
     
     
@@ -81,17 +89,21 @@ set(gca,'LineWidth',1.5,...
     'Box','off',...
     'xTick',0:10:90,...
     'xLim',[0,90],...
-    'yTick',20:10:60,...
-    'yLim',[20,60]);
+    'yTick',20:10:70,...
+    'yLim',[20,70]);
 pbaspect([3,1,1]);
-line([45,45],[20,60],'linestyle','--','color','k','linewidth',2);
+line([45,45],[20,70],'linestyle','--','color','k','linewidth',2);
 %set(gcf,'Renderer','painters');
+
+saveas(h,[destDir '/' 'CBF_PCA_Continuous_Plot_Control.jpeg'],'jpeg')
+
 
 
 % load Alpha Power data [NEED CONTROL DATA]
 load([sourceDir '/' 'Hilbert_Alpha_Master_Control.mat'])
+h=figure('Position',[676   695   607   307]);
 
-subplot(3,1,3)
+%subplot(3,1,3)
 for iPlot=1:2
     
     if  iPlot==1; theseData = MCA_BBT_HYPERAIR_NEW; thisColor = thisGray;
@@ -120,7 +132,10 @@ pbaspect([3,1,1]);
 line([45,45],[0,80],'linestyle','--','color','k','linewidth',2);
 %set(gcf,'Renderer','painters');
 
-% save figure
-saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots_Control.eps'],'epsc')
-saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots_Control.tiff'],'tiff')
-saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots_Control.jpeg'],'jpeg')
+saveas(h,[destDir '/' 'Alpha_Continuous_Plot_Control.jpeg'],'jpeg')
+
+
+% % save figure
+% saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots_Control.eps'],'epsc')
+% saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots_Control.tiff'],'tiff')
+% saveas(h,[destDir '/' 'CBF_EEG_Continuous_Plots_Control.jpeg'],'jpeg')
