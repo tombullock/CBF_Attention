@@ -161,17 +161,17 @@ for iIter=1:length(pMat)
    if pMat(iIter)<.05
        line([theseTimes(iIter), theseTimes(iIter+1)],[-3 -3],'linewidth',10,'color','k')
        
-%        if allPairwise(1,iIter)==1
-%            line([theseTimes(iIter), theseTimes(iIter+1)],[-4 -4],'linewidth',5,'color',thisRed./255)
-%        end
+       if allPairwise(1,iIter)==1
+           line([theseTimes(iIter), theseTimes(iIter+1)],[-5 -5],'linewidth',5,'color',thisRed./255)
+       end
        
        if allPairwise(2,iIter)==1
            line([theseTimes(iIter), theseTimes(iIter+1)],[-3.5 -3.5],'linewidth',10,'color',thisBlue./255)
        end
        
-%        if allPairwise(3,iIter)==1
-%            line([theseTimes(iIter), theseTimes(iIter+1)],[-6 -6],'linewidth',5,'color',thisMagenta./255)
-%        end
+       if allPairwise(3,iIter)==1
+           line([theseTimes(iIter), theseTimes(iIter+1)],[-6 -6],'linewidth',5,'color',thisMagenta./255)
+       end
        
    end
     
