@@ -31,7 +31,7 @@ load([sourceDir '/' 'BBT_Master_Control.mat'])
 
 
 % set up figure
-h=figure('Units','normalized','Position',[0         0.124392614188533         0.367485624673288         0.848396501457726]);
+%h=figure('Units','normalized','Position',[0         0.124392614188533         0.367485624673288         0.848396501457726]);
 %h.Renderer = 'painters';
 
 
@@ -92,15 +92,16 @@ mean_pc_CVC_PCA_MCA = [
 
 for iPlot=1:6
     
-    subplot(3,2,iPlot)
+    h=figure;
+    %subplot(3,2,iPlot)
     
     data = [];
-    if iPlot==1; data = mean_MCAv; this_yLim = [30,70]; %[30,100];
-    elseif iPlot==3; data = mean_PCAv; this_yLim = [20,50]; %[10,80];
-    elseif iPlot==5; data = mean_pc_CBFv_PCA_MCA; this_yLim = [0,12];% [-5,22];
-    elseif iPlot==2; data = mean_MCA_CVC; this_yLim = [.3,.8];% [.1,1.1];
-    elseif iPlot==4; data = mean_PCA_CVC; this_yLim = [.2,.5];% [.1,1.1];
-    elseif iPlot==6; data = mean_pc_CVC_PCA_MCA; this_yLim = [-2,14];% [-5,25];
+    if iPlot==1; data = mean_MCAv; this_yLim = [30,70]; thisTitle = 'mean_MCAv';%[30,100];
+    elseif iPlot==3; data = mean_PCAv; this_yLim = [20,50]; thisTitle = 'mean_PCAv'; %[10,80];
+    elseif iPlot==5; data = mean_pc_CBFv_PCA_MCA; this_yLim = [0,12]; thisTitle = 'mean_pc_CBFv'; % [-5,22];
+    elseif iPlot==2; data = mean_MCA_CVC; this_yLim = [.3,.8]; thisTitle = 'mean_MCAcvc'; % [.1,1.1];
+    elseif iPlot==4; data = mean_PCA_CVC; this_yLim = [.2,.5]; thisTitle = 'mean_PCAcvc'; % [.1,1.1];
+    elseif iPlot==6; data = mean_pc_CVC_PCA_MCA; this_yLim = [-2,14]; thisTitle = 'mean_pc_CVC'; % [-5,25];
     end
     
     % define colors for lines
@@ -125,7 +126,7 @@ for iPlot=1:6
         'Color','k','LineStyle','none','LineWidth',2.5,'CapSize',10); %
     
     % edit plot characteristics
-    set(gca,'FontSize',24,...
+    set(gca,'FontSize',42,...
         'xlim',[.5,4.5],...
         'LineWidth',1.5,...
         'xticklabels',{' ',' ',' ',' '},...
@@ -135,12 +136,14 @@ for iPlot=1:6
     
     pbaspect([1,1,1])
     
+    % save fig
+    saveas(h,['/home/bullock/CBF_Attention/Plots' '/' 'CBF_Control_' thisTitle '.eps'],'epsc')
+    
 end
 
 % save averaged BBT data
 save(['/home/bullock/CBF_Attention/Data_Compiled' '/' 'BBT_Master_Averaged_Data_Control.mat'],'mean_MCAv','mean_PCAv','mean_pc_CBFv_PCA_MCA','mean_MCA_CVC','mean_PCA_CVC','mean_pc_CVC_PCA_MCA')
 
-% save fig
-saveas(h,['/home/bullock/CBF_Attention/Plots' '/' 'CBF_Mean_Plots_Control.eps'],'epsc')
+
 
 
