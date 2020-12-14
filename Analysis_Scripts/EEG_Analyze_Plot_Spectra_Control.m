@@ -73,7 +73,7 @@ saveas(h,[destDir '/' 'EEG_Spectrograms_Control.eps'],'epsc');
 % load channel data
 load([sourceDir '/' 'chanlocs.mat'])
 
-h2=figure('OuterPosition',[676   640   577   362]);
+h2=figure('OuterPosition',[676   610   344   392]);
 
 cnt=0;
 for iPhase=1:2
