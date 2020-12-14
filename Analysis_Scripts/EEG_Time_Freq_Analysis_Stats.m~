@@ -16,7 +16,6 @@ rng('shuffle')
 % set dirs
 sourceDir = '/home/bullock/CBF_Attention/Data_Compiled';
 destDir = sourceDir;
-destDirPlot = '/home/bullock/CBF_Attention/Plots';
 
 % load data
 load([sourceDir '/' 'ERSP_Master.mat'])
@@ -63,7 +62,7 @@ end
 
 pValMatBinary = pValMat<0.05;
 
-h=figure('OuterPosition',[672    52   424   950]);
+h=figure;
 for iChan=1:4
    subplot(4,1,iChan);
     imagesc(pValMatBinary(:,:,iChan)');
@@ -71,20 +70,12 @@ for iChan=1:4
     pbaspect([1,1,1])
     colormap jet
     
-    if      iChan==1; thisTitle = 'frontal';
-    elseif  iChan==2; thisTitle = 'central';
-    elseif  iChan==3; thisTitle = 'pareital';
-    elseif  iChan==4; thisTitle = 'parieto-occipital';
-    end
-  
-   title(thisTitle,'FontSize',18)
+    if iChan==1; thisTitle = 'delta';
+    elseif 
     
-    set(gca,'xtick',0:2:12,'xTickLabel',-100:100:500,'ytick',1:4,'YTickLabel',{'Delta','Theta','Alpha','Beta '})
+    title('
+    set(gca,'xtick',0:2:12,'xTickLabel',-100:100:500)
 end
-
-saveas(h,[destDirPlot '/' 'ERSP_Stats.epsc'],'epsc')
-
-
 
 
 
