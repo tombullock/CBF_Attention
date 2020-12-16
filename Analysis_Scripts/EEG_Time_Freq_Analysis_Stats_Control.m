@@ -19,11 +19,11 @@ destDir = sourceDir;
 destDirPlot = '/home/bullock/CBF_Attention/Plots';
 
 % load data
-load([sourceDir '/' 'ERSP_Master.mat'])
+load([sourceDir '/' 'ERSP_Master_Control.mat'])
 
 % name variables
-var1_name = 'gas';
-var1_levels = 4;
+% var1_name = 'gas';
+% var1_levels = 2;
 
 % loop through freqs and times
 for iTimes = 1:12
@@ -45,10 +45,12 @@ for iTimes = 1:12
    
            
            % run ANOVA on observed data
-           statOutput = teg_repeated_measures_ANOVA(observedData,[var1_levels],{var1_name});
+%           statOutput = teg_repeated_measures_ANOVA(observedData,[var1_levels],{var1_name});
+           
+           [H,P,CI,STATS] = ttest(observedData(:,1),observedData(:,2));
            
            
-           pValMat(iTimes,iFreqs,iChans) = statOutput(4);
+           pValMat(iTimes,iFreqs,iChans) = P;
            
            
     
@@ -82,7 +84,7 @@ for iChan=1:4
     set(gca,'xtick',0:2:12,'xTickLabel',-100:100:500,'ytick',1:4,'YTickLabel',{'Delta','Theta','Alpha','Beta '})
 end
 
-saveas(h,[destDirPlot '/' 'ERSP_Stats.eps'],'epsc')
+saveas(h,[destDirPlot '/' 'ERSP_Stats_Control.eps'],'epsc')
 
 
 

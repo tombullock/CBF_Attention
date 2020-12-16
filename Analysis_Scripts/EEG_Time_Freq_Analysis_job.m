@@ -10,7 +10,7 @@ clear
 close all
 
 % which subs?
-subjects = [134,237,350,576,577,578,588,592,249,997:999];
+subjects = [134,237,350,576,577,578,588,592,249,997:999]; % no 350,577 for Hv
 
 % if run on local machine(0), else if run on cluster(1)
 processInParallel=1;
@@ -26,12 +26,13 @@ end
 for iSub=1:length(subjects)
     sjNum = subjects(iSub);
     
-    for iCond=1:4
+    for iCond=5;%1:4
         
         if       iCond==1; thisCond='air';
         elseif   iCond==2; thisCond='hypercapnia';
         elseif   iCond==3; thisCond='hypocapnia';
         elseif   iCond==4; thisCond='hypoxia';
+        elseif   iCond==5; thisCond='hyperair';
         end
         
         if processInParallel

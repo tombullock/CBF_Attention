@@ -1,7 +1,7 @@
 %{
-EEG_ERSP_Stats
+EEG_ERSP_Stats_Resampled
 Author: Tom Bullock
-Date: 12.11.20
+Date: 12.15.20
 
 Run stats on ERSPs
 
@@ -31,7 +31,7 @@ for iTimes = 1:12
    for iFreqs = 1:4 
        
        for iChans = 1:4
-    
+           
            theseTimes = [1,13; 14,25; 26,38; 39,50; 51,63; 64,76; 77,88; 89,100; 101,113; 114,126; 127,138; 139,151];
            
            theseFreqs = [1,3; 4,7; 8,12; 13,30];
@@ -39,10 +39,67 @@ for iTimes = 1:12
            theseChans = [1,3; 4,6; 7,9; 10,15];
            
            % grab times, freqs and chans
-           %observedData = mean(mean(mean(allERSP(:,:,theseChans(iChans,1):theseChans(iChans,2),find(freqs==iFreqs):find(freqs==iFreqs)+1,theseTimes(iTimes,1):theseTimes(iTimes,2)),3),4),5);
-          observedData = mean(mean(mean(allERSP(:,:,theseChans(iChans,1):theseChans(iChans,2),theseFreqs(iFreqs,1):theseFreqs(iFreqs,2),theseTimes(iTimes,1):theseTimes(iTimes,2)),3),4),5);
-
-   
+           observedData = mean(mean(mean(allERSP(:,:,theseChans(iChans,1):theseChans(iChans,2),theseFreqs(iFreqs,1):theseFreqs(iFreqs,2),theseTimes(iTimes,1):theseTimes(iTimes,2)),3),4),5);
+           
+           % generate resampled iterations for ANOVA/t-tests
+           for j=1:1000
+               
+               for i=1:size(observedData,1)    % for each row of the observed data
+                   thisPerm = randperm(size(observedData,2)); % shuffle colums for each row
+                   for k=1:length(thisPerm)
+                       nullDataMat(i,k,j) = observedData(i,thisPerm(k));
+                   end
+               end
+               
+               % do ANOVA on permuted data for each new iteration
+               statOutput = teg_repeated_measures_ANOVA(nullDataMat(:,:,j),[var1_levels],{var1_name});  % run ANOVA
+               var1.fValsNull(j,1) = statOutput(1,1);   % create column vectors of null F-values
+               clear statOutput
+               
+               % get post-hoc null t value distribution (only makes sense to create
+               % one null distribution for all combinations of tests, given within
+               % subjects column shuffling method)
+               [H,P,CI,STATS] = ttest(nullDataMat(:,1,j),nullDataMat(:,2,j));
+               tValsNull(j,1) = STATS.tstat;
+               clear STATS
+               
+           end
+           
+       end
+       
+    
+       
+       
+       
+    % run ANOVA on observed data
+    statOutput = teg_repeated_measures_ANOVA(observedData,[var1_levels],{var1_name});
+    % get fvalues
+    var1.fValObserved = statOutput(1,1);
+    % get effect sizes
+    var1.partialEtaSq = statOutput(1,7);
+    % get dfs
+    var1.df = statOutput(1,[2,3]);
+    
+    clear statOutput
+    
+    % sort null f-values, get index value and convert to percentile (VAR_1)
+    var1.NAME = var1_name;
+    var1.LEVELS = var1_levels;
+    var1.fValsNull = sort(var1.fValsNull(:,1),1,'descend');
+    [c var1.fValueIndex] = min(abs(var1.fValsNull - var1.fValObserved));
+    var1.fValueIndex = var1.fValueIndex/1000;
+    var1.pValueANOVA = var1.fValueIndex;
+    
+    clear cohens_d
+          
+          
+          
+          
+          
+          
+          
+          
+          
            
            % run ANOVA on observed data
            statOutput = teg_repeated_measures_ANOVA(observedData,[var1_levels],{var1_name});
@@ -61,28 +118,28 @@ end
 
 
 
-pValMatBinary = pValMat<0.05;
-
-h=figure('OuterPosition',[672    52   424   950]);
-for iChan=1:4
-   subplot(4,1,iChan);
-    imagesc(pValMatBinary(:,:,iChan)');
-    set(gca,'YDir','normal');
-    pbaspect([1,1,1])
-    colormap jet
-    
-    if      iChan==1; thisTitle = 'frontal';
-    elseif  iChan==2; thisTitle = 'central';
-    elseif  iChan==3; thisTitle = 'pareital';
-    elseif  iChan==4; thisTitle = 'parieto-occipital';
-    end
-  
-   title(thisTitle,'FontSize',18)
-    
-    set(gca,'xtick',0:2:12,'xTickLabel',-100:100:500,'ytick',1:4,'YTickLabel',{'Delta','Theta','Alpha','Beta '})
-end
-
-saveas(h,[destDirPlot '/' 'ERSP_Stats.eps'],'epsc')
+% pValMatBinary = pValMat<0.05;
+% 
+% h=figure('OuterPosition',[672    52   424   950]);
+% for iChan=1:4
+%    subplot(4,1,iChan);
+%     imagesc(pValMatBinary(:,:,iChan)');
+%     set(gca,'YDir','normal');
+%     pbaspect([1,1,1])
+%     colormap jet
+%     
+%     if      iChan==1; thisTitle = 'frontal';
+%     elseif  iChan==2; thisTitle = 'central';
+%     elseif  iChan==3; thisTitle = 'pareital';
+%     elseif  iChan==4; thisTitle = 'parieto-occipital';
+%     end
+%   
+%    title(thisTitle,'FontSize',18)
+%     
+%     set(gca,'xtick',0:2:12,'xTickLabel',-100:100:500,'ytick',1:4,'YTickLabel',{'Delta','Theta','Alpha','Beta '})
+% end
+% 
+% saveas(h,[destDirPlot '/' 'ERSP_Stats.eps'],'epsc')
 
 
 

@@ -1,5 +1,5 @@
 %{
-EEG_Time_Freq_Compile_Mats
+EEG_Time_Freq_Compile_Plot_Control
 Author:Tom
 Date: 12.10.20
 %}
@@ -10,19 +10,18 @@ close all
 % set dirs
 sourceDir = '/home/bullock/CBF_Attention/EEG_ERSPs';
 destDir = '/home/bullock/CBF_Attention/Data_Compiled';
+destDirPlot = '/home/bullock/CBF_Attention/Plots';
 
 % subjects
-subjects = [134,237,350,576,577,578,588,592,249,997:999];
+subjects = [134,237,576,578,588,592,249,997:999];
 
 % loop
 for iSub=1:length(subjects)
     sjNum=subjects(iSub);
-    for iCond=1:4
+    for iCond=1:2
         
-        if       iCond==1; thisCond='air';
-        elseif   iCond==2; thisCond='hypercapnia';
-        elseif   iCond==3; thisCond='hypocapnia';
-        elseif   iCond==4; thisCond='hypoxia';
+        if       iCond==1; thisCond='hyperair';
+        elseif   iCond==2; thisCond='hypocapnia';
         end
         
         load([sourceDir '/' sprintf('sj%d_%s_ERSP.mat',sjNum,thisCond)])
@@ -32,21 +31,21 @@ for iSub=1:length(subjects)
     end
 end
 
-save([destDir '/' 'ERSP_Master.mat'],'allERSP','times','freqs','subjects')
+save([destDir '/' 'ERSP_Master_Control.mat'],'allERSP','times','freqs','subjects')
 
 
 % plot data on heatmaps
-h=figure('Units','normalized','OuterPosition',[0,0,1,1]);
 for iChan=1:4
-    for iPlot=1:4
+    h=figure('Units','normalized','OuterPosition',[0.0956612650287506         0.392614188532556         0.462624150548876         0.422740524781341]);
+    for iPlot=1:2
         
-        if      iChan==1; theseChans = 1:3;
-        elseif  iChan==2; theseChans = 4:6;
-        elseif  iChan==3; theseChans = 7:9;
-        elseif  iChan==4; theseChans = 10:15;
+        if      iChan==1; theseChans = 1:3; thisRegion = 'frontal';
+        elseif  iChan==2; theseChans = 4:6; thisRegion = 'central';
+        elseif  iChan==3; theseChans = 7:9; thisRegion = 'parietal';
+        elseif  iChan==4; theseChans = 10:15; thisRegion = 'parieto-occipital';
         end
         
-        subplot(1,4,iPlot);
+        subplot(1,2,iPlot);
         imagesc(squeeze(mean(mean(allERSP(:,iPlot,theseChans,:,:),1),3)),[-.3,.3]); hold on
         %line([26,26],[1,30],'color','k','linestyle',':','linewidth',2);
         pbaspect([1,1,1])
@@ -62,9 +61,9 @@ for iChan=1:4
         %cbar
         
     end
+    
+    saveas(h,[destDirPlot '/' 'ERSP_' thisRegion '_Control.eps'],'epsc')
 end
-
-
 
 
 
