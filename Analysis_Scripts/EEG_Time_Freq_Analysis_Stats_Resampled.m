@@ -65,7 +65,6 @@ for iTimes = 1:12
                
            end
            
-                  
            % run ANOVA on observed data
            statOutput = teg_repeated_measures_ANOVA(observedData,[var1_levels],{var1_name});
            % get fvalues
@@ -92,6 +91,82 @@ for iTimes = 1:12
            
            clear var1
            
+           
+           
+           %% do t-tests on observed data
+           for iTest=1:3
+               if       iTest==1; thisPair=[1,2]; % hcap rest
+               elseif   iTest==2; thisPair=[1,3]; % hpo rest
+               elseif   iTest==3; thisPair=[1,4]; % hpox rest
+               end
+               
+               [H,P,CI,STATS] = ttest(observedData(:,thisPair(1)),observedData(:,thisPair(2)));
+               tValsObs(1,iTest) = STATS.tstat;
+               cohens_d(iTest)=computeCohen_d(observedData(:,thisPair(1)),observedData(:,thisPair(2)),'paired');
+               
+               
+               % compute descriptives for % change
+               pairPc = ((observedData(:,thisPair(2)) - observedData(:,thisPair(1)))./observedData(:,thisPair(1)))*100;
+               pairPcDescriptives(iTest,1) = mean(pairPc);
+               pairPcDescriptives(iTest,2) = std(pairPc)/sqrt(size(pairPc,1));
+               
+               % compute dfs
+               tValsObs(2,iTest) = STATS.df;
+               clear STATS
+           end
+           
+           % sort null f-values, get index value and convert to percentile
+           tValsNull = sort(tValsNull(:,1),1,'descend');
+           
+           % compare observed t values with the distribution of null t values
+           [c tValueIndex(1)] = min(abs(tValsNull - tValsObs(1,1)));
+           [c tValueIndex(2)] = min(abs(tValsNull - tValsObs(1,2)));
+           [c tValueIndex(3)] = min(abs(tValsNull - tValsObs(1,3)));
+           
+           % convert to percentiles
+           tValueIndex = tValueIndex./1000;
+           pValuesPairwise = tValueIndex;
+           
+           % add pnull values to tValsObs for easy viewing
+           tValsObs(3,:) = pValuesPairwise;
+           
+           % critical t score
+           tmpA = tValsNull(25);
+           tmpB = tValsNull(975);
+           
+           if tmpA<0
+               tCriticalNeg = tmpA;
+               tCriticalPos = tmpB;
+           else
+               tCriticalNeg = tmpB;
+               tCriticalPos = tmpA;
+           end
+           
+           
+           % compare critical t score to distribution and present 0 (ns) or 1(sig)
+           % values in output
+           for i=1:3
+               if tValsObs(1,i)<0 && tValsObs(1,i)<tCriticalNeg
+                   tValsObs(4,i)=1;
+               elseif tValsObs(1,i)>0 && tValsObs(1,i)>tCriticalPos
+                   tValsObs(4,i)=1;
+               else
+                   tValsObs(4,i)=0;
+               end
+           end
+           
+           % add cohens d effect sizes into tValsObs matrix
+           tValsObs(5,:) = cohens_d;
+           
+           % create a pairwise t-test mat for plotting
+           pairwiseMat(iTimes,iFreqs,iChans,:) = tValsObs(3,:);
+           
+           
+           
+           
+           
+           
+           
        end
        
 %            % run ANOVA on observed data
@@ -110,6 +185,14 @@ end
 
 
 
+
+
+
+
+
+
+
+% generate plots for ANOVA effects
 pValMatBinary = pValMat<0.05;
 
 h=figure('OuterPosition',[672    52   424   950]);
@@ -132,6 +215,37 @@ for iChan=1:4
 end
 
 saveas(h,[destDirPlot '/' 'ERSP_Stats_Resampled.eps'],'epsc')
+
+
+% generate plots for PAIRWISE EFFECTS
+pValMatBinary = pairwiseMat<0.05;
+
+for pairwiseComp=1:3
+    h=figure('OuterPosition',[672    52   424   950]);
+    for iChan=1:4
+        subplot(4,1,iChan);
+        imagesc(pValMatBinary(:,:,iChan,pairwiseComp)');
+        set(gca,'YDir','normal');
+        pbaspect([1,1,1])
+        colormap jet
+        
+        if      iChan==1; thisTitle = 'frontal';
+        elseif  iChan==2; thisTitle = 'central';
+        elseif  iChan==3; thisTitle = 'pareital';
+        elseif  iChan==4; thisTitle = 'parieto-occipital';
+        end
+        
+        title(thisTitle,'FontSize',18)
+        
+        set(gca,'xtick',0:2:12,'xTickLabel',-100:100:500,'ytick',1:4,'YTickLabel',{'Delta','Theta','Alpha','Beta '})
+    end
+    
+    saveas(h,[destDirPlot '/' 'ERSP_Stats_Resampled_Pair' num2str(pairwiseComp) '.eps'],'epsc')
+    
+end
+
+
+
 
 
 
