@@ -41,7 +41,7 @@ for iSub=1:length(subjects)
         load([sourceDir '/' sprintf('sj%d_%s_erp_tar_hit_ft_ep.mat',sjNum,thisCond)])
         
         % baseline correct target data to prestim critical target period
-        EEG = pop_rmbase(EEG,400:500);
+        EEG = pop_rmbase(EEG,[400,500]);
         
         % get number of trials
         ERP_Tar_nTrials(iSub,iCond) = EEG.trials;
