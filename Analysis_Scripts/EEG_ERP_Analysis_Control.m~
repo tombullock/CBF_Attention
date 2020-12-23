@@ -125,59 +125,56 @@ set(gca,...
     
     
 
-% % Plot stats
-% 
-% % name variables
-% var1_name = 'gas'; % gas cond
-% var1_levels = 2;
-% 
-% for iIter=1:750
-%     
-%     observedData = allErps(:,:,iIter)';
-%     
-%     statOutput = teg_repeated_measures_ANOVA(observedData,[var1_levels],{var1_name});
-% 
-%     pMat(iIter) = statOutput(4);
-%     
-%     H1=ttest(observedData(:,1),observedData(2));
-%     
-%     allPairwise(1,iIter)=H1;
-% 
-% end
-% 
-% 
-% pMat = pMat(351:551);
-% 
-% %plot(pMat)
-% 
-% allPairwise = allPairwise(:,351:551);
-% 
-% theseTimes = EEG.times(351:551);
-% 
-% for iIter=1:length(pMat)
-%     
-%    if pMat(iIter)<.05
-%        line([theseTimes(iIter), theseTimes(iIter+1)],[-3 -3],'linewidth',10,'color','k')
-%        
-%        if allPairwise(1,iIter)==1
-%            line([theseTimes(iIter), theseTimes(iIter+1)],[-5 -5],'linewidth',5,'color',thisRed./255)
-%        end
-%        
-% 
-%        
-%    end
-%     
-% end
+% Plot stats
+
+% name variables
+var1_name = 'gas'; % gas cond
+var1_levels = 2;
+
+for iIter=1:750
+    
+    observedData = allErps(:,:,iIter)';
+    
+    statOutput = teg_repeated_measures_ANOVA(observedData,[var1_levels],{var1_name});
+
+    pMat(iIter) = statOutput(4);
+    
+    H1=ttest(observedData(:,1),observedData(2));
+    
+    allPairwise(1,iIter)=H1;
+
+end
 
 
+pMat = pMat(351:551);
 
-%pMat = pMat(351:551);
+%plot(pMat)
+
+allPairwise = allPairwise(:,351:551);
+
 theseTimes = EEG.times(351:551);
 
-pairwiseMat = pairwiseMat(351:551);
+for iIter=1:length(pMat)
+    
+   if pMat(iIter)<.05
+       line([theseTimes(iIter), theseTimes(iIter+1)],[-3 -3],'linewidth',10,'color','k')
+       
+       if allPairwise(1,iIter)==1
+           line([theseTimes(iIter), theseTimes(iIter+1)],[-5 -5],'linewidth',5,'color',thisRed./255)
+       end
+       
+
+       
+   end
+    
+end
+
+
+
+pMat = pMat(351:551);
 
 % plot resampled stat results
-for iIter=1:length(pairwiseMat)
+for iIter=1:length(pMat)
     
     
     
