@@ -64,9 +64,7 @@ for iChan=5;%1:4
         %cbar
         
             % draw rectangle to indicate sig theta (150-250ms)
-    rectangle('Position',[64,4,36,4],'LineWidth',3,'LineStyle','--'); % indicates sig. theta from 150-300ms
-    rectangle('Position',[139,8,12,4],'LineWidth',3,'LineStyle','--'); % indicates sig. alpha from 450-500ms
-    rectangle('Position',[101,13,12,17],'LineWidth',3,'LineStyle','--'); % indicates sig. beta from 300-350ms
+    rectangle('Position',[64,4,24,4],'LineWidth',3,'LineStyle','--')
         
     end
     

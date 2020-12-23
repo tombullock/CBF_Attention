@@ -71,7 +71,14 @@ for iSub=1:length(subjects)
         EEG_90sec = pop_epoch(EEG,{'200'},[1,89]); % 90 sec x6  fix>task cycle [going out 0,90 means epochs geet cut out]
         EEG_45sec_task = pop_epoch(EEG,{'100'},[1,44]); % 45 sec task 
         EEG_45sec_fix = pop_epoch(EEG,{'200'},[1,44]); % 45 sec fix
-       
+        
+        % additional Alpha hit/miss analyses
+        EEG_alpha_hit = pop_epoch(EEG,{'B2(101)'},[-4,4]);
+        try
+            EEG_alpha_miss = pop_epoch(EEG,{'B3(101)'},[-4,4]);
+        catch
+            disp('NO ALPHA MISS TRIALS!')
+        end
         
         % add threshold based art. rejection here if needed! (see prev
         % process script)
@@ -92,7 +99,7 @@ for iSub=1:length(subjects)
         if sjNum==578
             theseAnalyses = [1,2,4:6];
         else
-            theseAnalyses = 1:6;
+            theseAnalyses = 1:8;
         end
         
         % remove baseline if needed and save data
@@ -104,13 +111,17 @@ for iSub=1:length(subjects)
             elseif  iEpoch==4; EEG = EEG_90sec; thisBaseline = []; epochType = 'fixTask90';
             elseif  iEpoch==5; EEG = EEG_45sec_task; thisBaseline = []; epochType = 'task45'; % check this baseline
             elseif  iEpoch==6; EEG = EEG_45sec_fix; thisBaseline = []; epochType = 'fix45'; % check this baseline
+                
+            elseif  iEpoch==7; EEG = EEG_alpha_hit; thisBaseline = []; epochType = 'alpha_tar_hit'; artRejWindow = [-4,4];
+            elseif  iEpoch==8; EEG = EEG_alpha_miss; thisBaseline = []; epochType = 'alpha_tar_miss'; artRejWindow = [-4,4];
+                
             end
             
             EEG = pop_rmbase( EEG, thisBaseline); % remove baseline
             
             % do threshold based artifact rejection on short epoch data
             pcRejTrials = [];
-            if ismember(iEpoch,1:3)
+            if ismember(iEpoch,[1:3,7:8])
                 EEG = pop_eegthresh(EEG,1,1:17,-75,75,artRejWindow(1),artRejWindow(2),0,1);
                 pcRejTrials = (sum(EEG.reject.rejthresh)/length(EEG.reject.rejthresh))*100;
             end

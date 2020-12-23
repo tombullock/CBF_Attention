@@ -187,7 +187,7 @@ for iTimes = 1:12
     
 end
 
-save([destDir '/' 'EEG_ERSP_STATS.mat'],'pValMat','pValuesPairwise','fValMat','theseTimes','theseFreqs','theseChans')
+save([destDir '/' 'EEG_ERSP_STATS.mat'],'pVal
 
 
 
