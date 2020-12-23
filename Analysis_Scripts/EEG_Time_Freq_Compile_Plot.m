@@ -74,6 +74,53 @@ for iChan=5;%1:4
 end
 
 
+% create bar plots for sig different regions
+h=figure;%('Units','normalized','OuterPosition',[0.659026724336034                         0         0.269857089903338                         1]);
+for iPlot=1:3
+    subplot(1,3,iPlot);
+    if iPlot==1; theseFreqs=4:8; theseTimes = 64:100;
+    elseif iPlot==2; theseFreqs=8:12; theseTimes = 139:151;
+    elseif iPlot==3; theseFreqs=13:30; theseTimes = 101:113;
+    end
+    
+    % generate data
+    theseData = mean(mean(mean(allERSP(:,:,7:15,theseFreqs,theseTimes),3),4),5);
+    mean_theseData = mean(theseData,1);
+    sem_theseData = std(theseData,0,1)/sqrt(size(theseData,1));
+    
+    % define colors for lines
+    thisGreen = [0 100 0];
+    thisRed = [255 0 0 ];
+    thisBlue = [30 144 255];
+    thisMagenta = [153 50 204];
+    
+    % plot bars
+    for i=1:4
+        if i==1; thisColor = thisGreen;
+        elseif i==2; thisColor = thisRed;
+        elseif i==3; thisColor = thisBlue;
+        elseif i==4; thisColor = thisMagenta;
+        end
+        
+        bar(i,mean_theseData(i),'FaceColor',thisColor./255); hold on
+        
+    end
+    
+    
+    % plot error bars
+    errorbar(1:1:4,mean_theseData,sem_theseData,...
+        'Color','k','LineStyle','none','LineWidth',2.5,'CapSize',10); %
+    
+    set(gca,'box','off','xticklabels',{' ',' ',' ',' '},'xtick',[],'FontSize',24,'linewidth',1.5,'xlim',[.5,4.5])
+    
+    pbaspect([1,1,1])
+    
+    
+end
+
+%% SAVE PLOT MANUALLY!!! %%%
+
+
 
 
 % % plot bars [need to figure out time/freq bounds first]

@@ -187,7 +187,7 @@ for iTimes = 1:12
     
 end
 
-save([destDir '/' 'EEG_ERSP_STATS.mat'],'pValMat','pValuesPairwise','fValMat','theseTimes','theseFreqs','theseChans')
+save([destDir '/' 'EEG_ERSP_STATS.mat'],'pValMat','pValuesPairwise','fValMat','theseTimes','theseFreqs','theseChans','pairwiseMat')
 
 
 
@@ -198,7 +198,7 @@ save([destDir '/' 'EEG_ERSP_STATS.mat'],'pValMat','pValuesPairwise','fValMat','t
 
 
 
-
+load([destDir '/' 'EEG_ERSP_STATS.mat'])
 
 % generate plots for ANOVA effects
 pValMatBinary = pValMat<0.05;
@@ -260,6 +260,12 @@ for pairwiseComp=1:3
     
 end
 saveas(h,[destDirPlot '/' 'ERSP_Stats_Resampled_Pair' num2str(pairwiseComp) '.eps'],'epsc')
+
+
+
+
+
+
 
 
 
