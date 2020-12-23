@@ -35,15 +35,17 @@ save([destDir '/' 'ERSP_Master_Control.mat'],'allERSP','times','freqs','subjects
 
 
 % plot data on heatmaps
-for iChan=1:4
+for iChan=1;%1:4
     h=figure('Units','normalized','OuterPosition',[0.0956612650287506         0.392614188532556         0.462624150548876         0.422740524781341]);
     for iPlot=1:2
         
-        if      iChan==1; theseChans = 1:3; thisRegion = 'frontal';
-        elseif  iChan==2; theseChans = 4:6; thisRegion = 'central';
-        elseif  iChan==3; theseChans = 7:9; thisRegion = 'parietal';
-        elseif  iChan==4; theseChans = 10:15; thisRegion = 'parieto-occipital';
-        end
+%         if      iChan==1; theseChans = 1:3; thisRegion = 'frontal';
+%         elseif  iChan==2; theseChans = 4:6; thisRegion = 'central';
+%         elseif  iChan==3; theseChans = 7:9; thisRegion = 'parietal';
+%         elseif  iChan==4; theseChans = 10:15; thisRegion = 'parieto-occipital';
+%         end
+        thisRegion = 'backOfHead';
+        theseChans = 7:15;
         
         subplot(1,2,iPlot);
         imagesc(squeeze(mean(mean(allERSP(:,iPlot,theseChans,:,:),1),3)),[-.3,.3]); hold on
@@ -51,15 +53,23 @@ for iChan=1:4
         pbaspect([1,1,1])
         set(gca,...
             'YDir','normal',...
-            'xTick',[1,26,52,101,151],...
-            'xticklabel',[-100,0,100,300,500],...
+            'xTick',[26,52,101,151],...
+            'xticklabel',[0,100,300,500],...
             'YTick',[1,4,8,12,16,20,24,28]*1,...
             'YTickLabel',[1,4,8,12,16,20,24,28],...
-            'FontSize',18);
+            'FontSize',24,...
+            'LineWidth',1.5);
         
         colormap jet
         %cbar
         
+    
+    
+    % draw rectangle to indicate sig theta (150-250ms)
+    rectangle('Position',[77,4,36,4],'LineWidth',3,'LineStyle','--'); % indicates sig. theta from 150-300ms
+    rectangle('Position',[127,8,24,4],'LineWidth',3,'LineStyle','--'); % indicates sig. alpha from 400-500ms
+    
+    
     end
     
     saveas(h,[destDirPlot '/' 'ERSP_' thisRegion '_Control.eps'],'epsc')

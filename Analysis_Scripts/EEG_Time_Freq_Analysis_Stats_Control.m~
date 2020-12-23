@@ -8,7 +8,7 @@ Run stats on ERSPs
 %}
 
 clear
-close all
+%close all
 
 % seed rng
 rng('shuffle')
@@ -70,7 +70,7 @@ for iTimes = 1:12
                     thisPair = [1,2];
           [H,P,CI,STATS] = ttest(observedData(:,thisPair(1)),observedData(:,thisPair(2)));
           tValsObs = STATS.tstat;
-          %cohens_d(iTest)=computeCohen_d(observedData(:,thisPair(1)),observedData(:,thisPair(2)),'paired');
+          cohens_d(iTest)=computeCohen_d(observedData(:,thisPair(1)),observedData(:,thisPair(2)),'paired');
           
           
           
@@ -114,7 +114,7 @@ for iTimes = 1:12
            end
            
            % add cohens d effect sizes into tValsObs matrix
-          % tValsObs(5,:) = cohens_d;
+           tValsObs(5,:) = cohens_d;
            
            % create a pairwise t-test mat for plotting
            % if doing multiple chans
@@ -149,7 +149,7 @@ for iTimes = 1:12
            
           % [H,P,CI,STATS] = ttest(observedData(:,1),observedData(:,2));
            
-           pValMat(iTimes,iFreqs) = tValsObs(4);
+           pValMat(iTimes,iFreqs) = tVal;
            
        end
        
@@ -158,7 +158,7 @@ for iTimes = 1:12
 end
 
 
-pValMatBinary = pValMat%<0.05;
+pValMatBinary = pValMat<0.05;
 
 h=figure('OuterPosition',[672    52   424   950]);
 for iChan=1;%1:4
