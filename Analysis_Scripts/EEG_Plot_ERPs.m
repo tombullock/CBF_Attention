@@ -71,7 +71,11 @@ set(gca,...
 'fontsize',18,...
 'XTick',[400,500,600,800,1000,1200],...
 'XTickLabel',[-100,0,100,300,500,700],...
+'Ylim',[-4,10],...
+'YTick',-4:2:10,...
 'box','off');
+
+pbaspect([2,1,1]);
     
     
 
@@ -112,7 +116,7 @@ for iIter=1:length(pMat)
     
     if iIter>1 % skip first point (erroneous)
         if pMat(iIter)<.05
-            line([theseTimes(iIter), theseTimes(iIter+1)],[-3 -3],'linewidth',10,'color','k')
+            line([theseTimes(iIter), theseTimes(iIter+1)],[-2.5 -2.5],'linewidth',10,'color','k')
             
             if allPairwise(1,iIter)<.05
                 line([theseTimes(iIter), theseTimes(iIter+1)],[-5 -5],'linewidth',5,'color',thisRed./255)
