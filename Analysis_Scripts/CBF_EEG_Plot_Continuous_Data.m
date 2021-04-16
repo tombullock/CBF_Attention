@@ -33,10 +33,10 @@ h=figure('Units','normalized','Position',[0,0,.4,1]);
 subplot(3,1,1);
 for iPlot=1:4
     
-    if      iPlot==1; theseData = MCA_BBT_AIR_NEW; thisColor = thisGreen;
-    elseif  iPlot==2; theseData = MCA_BBT_HYPERCAP_NEW; thisColor = thisRed;
-    elseif  iPlot==3; theseData = MCA_BBT_HYPOCAP_NEW; thisColor = thisBlue;
-    elseif  iPlot==4; theseData = MCA_BBT_HYPOXIA_NEW; thisColor = thisMagenta;
+    if      iPlot==1; theseData = MCA_BBT_AIR_NEW(:,1:11); thisColor = thisGreen;
+    elseif  iPlot==2; theseData = MCA_BBT_HYPERCAP_NEW(:,1:11); thisColor = thisRed;
+    elseif  iPlot==3; theseData = MCA_BBT_HYPOCAP_NEW(:,1:11); thisColor = thisBlue;
+    elseif  iPlot==4; theseData = MCA_BBT_HYPOXIA_NEW(:,1:11); thisColor = thisMagenta;
     end
         
     thisMean = mean(theseData,2);
@@ -62,10 +62,10 @@ line([45,45],[30,80],'linestyle','--','color','k','linewidth',2);
 subplot(3,1,2)
 for iPlot=1:4
     
-    if      iPlot==1; theseData = PCA_BBT_AIR_NEW; thisColor = thisGreen;
-    elseif  iPlot==2; theseData = PCA_BBT_HYPERCAP_NEW; thisColor = thisRed;
-    elseif  iPlot==3; theseData = PCA_BBT_HYPOCAP_NEW; thisColor = thisBlue;
-    elseif  iPlot==4; theseData = PCA_BBT_HYPOXIA_NEW; thisColor = thisMagenta;
+    if      iPlot==1; theseData = PCA_BBT_AIR_NEW(:,1:11); thisColor = thisGreen;
+    elseif  iPlot==2; theseData = PCA_BBT_HYPERCAP_NEW(:,1:11); thisColor = thisRed;
+    elseif  iPlot==3; theseData = PCA_BBT_HYPOCAP_NEW(:,1:11); thisColor = thisBlue;
+    elseif  iPlot==4; theseData = PCA_BBT_HYPOXIA_NEW(:,1:11); thisColor = thisMagenta;
     end
         
     thisMean = mean(theseData,2);

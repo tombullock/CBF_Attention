@@ -1,5 +1,5 @@
 %{
-CBF_Stats_Control
+EEG_Spectra_Stats_ALPHA
 Author: Tom Bullock
 Date: 12.09.20
 
@@ -20,26 +20,35 @@ sourceDir = '/home/bullock/CBF_Attention/Data_Compiled';
 destDir = sourceDir;
 
 % load data
-load([sourceDir '/' 'BBT_Master_Averaged_Data_Control.mat'])
+load([sourceDir '/' 'EEG_Spectra.mat'])
 
 
 
 % loop through different datasets and run analyses
-for iData=[1,2,4,5,3,6]
+for iData=1:3
     
     % which data?
-    if iData==1
-        observedData = mean_MCAv(1:9,:);
+    if iData==1 % alpha (regular)
+        observedData = [mean(mean(allSpectra(:,:,1,10:15,find(freqs==8):find(freqs==12)),4),5), mean(mean(allSpectra(:,:,2,10:15,find(freqs==8):find(freqs==12)),4),5)];
     elseif iData==2
-        observedData = mean_PCAv(1:9,:);
-    elseif iData==4
-        observedData = mean_MCA_CVC;
-    elseif iData==5
-        observedData = mean_PCA_CVC;
+        
+        thisAlpha = [mean(mean(allSpectra(:,:,1,10:15,find(freqs==8):find(freqs==12)),4),5), mean(mean(allSpectra(:,:,2,10:15,find(freqs==8):find(freqs==12)),4),5)];
+        
+        thisThetaBeta = [...  % for baseline corr
+            mean(mean(allSpectra(:,:,1,10:15,[find(freqs==4):find(freqs==8)-1, find(freqs==15):find(freqs==20)]),4),5), ...
+            mean(mean(allSpectra(:,:,2,10:15,[find(freqs==4):find(freqs==8)-1, find(freqs==15):find(freqs==20)]),4),5)];
+        
+        % create dataset for alpha with baseline corr
+        observedData = thisAlpha - thisThetaBeta;
+        
+        clear thisAlpha thisThetaBeta
+        
     elseif iData==3
-        observedData = mean_pc_CBFv_PCA_MCA(1:9,:);
-    elseif iData==6
-        observedData = mean_pc_CVC_PCA_MCA;
+        
+        freqIdx = 533; % freq - 16.6667
+    
+        observedData = mean(mean(allSpectra(:,:,2,10:15,find(freqs==8):find(freqs==12)),4),5);
+        
     end
     
 %     % remove sj idx 12 from all conditions (missing data in some)
@@ -49,18 +58,12 @@ for iData=[1,2,4,5,3,6]
     
     
     % name variables
-    if ismember(iData,[1,2,4,5])
-        var1_name = 'gas'; % gas cond
-        var1_levels = 2;
-        var2_name = 'phase'; % rest or task phase
-        var2_levels = 2;
-    elseif ismember(iData,[3,6])
-        var1_name = 'gas'; % gas cond
-        var1_levels = 2;
-        var2_name = 'artery'; % artery 
-        var2_levels = 2;
-    end
-    
+    var1_name = 'phase'; % gas cond
+    var1_levels = 2;
+    var2_name = 'gas'; % rest or task phase
+    var2_levels = 4;
+
+
         
     
     
@@ -134,15 +137,20 @@ for iData=[1,2,4,5,3,6]
     
     clear cohens_d
     
+    
+    
+    
     % only to t-tests on certain datasets
-    if ismember(iData,[1,2,4,5])
+    if ismember(iData,[1,2])
         
         % do t-tests on observed data
-        for iTest=1:4
-            if       iTest==1; thisPair=[1,3]; % hv RvT
-            elseif   iTest==2; thisPair=[2,4]; % hpo RvT
-            elseif   iTest==3; thisPair=[1,2]; % hpo RvT
-            elseif   iTest==4; thisPair=[3,4]; % hpo RvT
+        for iTest=1:6
+            if       iTest==1; thisPair=[1,2]; % hcap rest
+            elseif   iTest==2; thisPair=[1,3]; % hpo rest
+            elseif   iTest==3; thisPair=[1,4]; % hpox rest
+            elseif   iTest==4; thisPair=[5,6]; % hcap task
+            elseif   iTest==5; thisPair=[5,7]; % hpo task
+            elseif   iTest==6; thisPair=[5,8]; % hpox task
             end
             
             [H,P,CI,STATS] = ttest(observedData(:,thisPair(1)),observedData(:,thisPair(2)));
@@ -168,6 +176,8 @@ for iData=[1,2,4,5,3,6]
         [c tValueIndex(2)] = min(abs(tValsNull - tValsObs(1,2)));
         [c tValueIndex(3)] = min(abs(tValsNull - tValsObs(1,3)));
         [c tValueIndex(4)] = min(abs(tValsNull - tValsObs(1,4)));
+        [c tValueIndex(5)] = min(abs(tValsNull - tValsObs(1,5)));
+        [c tValueIndex(6)] = min(abs(tValsNull - tValsObs(1,6)));
         
         % convert to percentiles
         tValueIndex = tValueIndex./1000;
@@ -191,7 +201,7 @@ for iData=[1,2,4,5,3,6]
         
         % compare critical t score to distribution and present 0 (ns) or 1(sig)
         % values in output
-        for i=1:4
+        for i=1:6
             if tValsObs(1,i)<0 && tValsObs(1,i)<tCriticalNeg
                 tValsObs(4,i)=1;
             elseif tValsObs(1,i)>0 && tValsObs(1,i)>tCriticalPos
@@ -215,39 +225,23 @@ for iData=[1,2,4,5,3,6]
     
     % save data
     if iData==1
-        MCAv_Stats.ANOVA.var1 = var1;
-        MCAv_Stats.ANOVA.var2 = var2;
-        MCAv_Stats.ANOVA.varInt = varInt;
-        MCAv_Stats.Pairwise.t = tValsObs;
-        MCAv_Stats.pairPcDescriptives = pairPcDescriptives;
+        Alpha_Stats.ANOVA.var1 = var1;
+        Alpha_Stats.ANOVA.var2 = var2;
+        Alpha_Stats.ANOVA.varInt = varInt;
+        Alpha_Stats.Pairwise.t = tValsObs;
+        Alpha_Stats.pairPcDescriptives = pairPcDescriptives;
     elseif iData==2
-        PCAv_Stats.ANOVA.var1 = var1;
-        PCAv_Stats.ANOVA.var2 = var2;
-        PCAv_Stats.ANOVA.varInt = varInt;
-        PCAv_Stats.Pairwise.t = tValsObs;
-        PCAv_Stats.pairPcDescriptives = pairPcDescriptives;
-    elseif iData==4
-        MCAc_Stats.ANOVA.var1 = var1;
-        MCAc_Stats.ANOVA.var2 = var2;
-        MCAc_Stats.ANOVA.varInt = varInt;
-        MCAc_Stats.Pairwise.t = tValsObs;
-        MCAc_Stats.pairPcDescriptives = pairPcDescriptives;
-    elseif iData==5
-        PCAc_Stats.ANOVA.var1 = var1;
-        PCAc_Stats.ANOVA.var2 = var2;
-        PCAc_Stats.ANOVA.varInt = varInt;
-        PCAc_Stats.Pairwise.t = tValsObs;
-        PCAc_Stats.pairPcDescriptives = pairPcDescriptives;
+        Alpha_Stats_BLC.ANOVA.var1 = var1;
+        Alpha_Stats_BLC.ANOVA.var2 = var2;
+        Alpha_Stats_BLC.ANOVA.varInt = varInt;
+        Alpha_Stats_BLC.Pairwise.t = tValsObs;
+        Alpha_Stats_BLC.pairPcDescriptives = pairPcDescriptives;
     elseif iData==3
-        pcCBFv_Stats.ANOVA.var1 = var1;
-        pcCBFv_Stats.ANOVA.var2 = var2;
-        pcCBFv_Stats.ANOVA.varInt = varInt;
-        pcCBFv_Stats.Pairwise_One_Sample = tValsObs;
-    elseif iData==6
-        pcCBFc_Stats.ANOVA.var1 = var1;
-        pcCBFc_Stats.ANOVA.var2 = var2;
-        pcCBFc_Stats.ANOVA.varInt = varInt;
-        pcCBFc_Stats.Pairwise_One_Sample = tValsObs;
+        SSV_Stats.ANOVA.var1 = var1;
+        SSV_Stats.ANOVA.var2 = var2;
+        SSV_Stats.ANOVA.varInt = varInt;
+        SSV_Stats.Pairwise.t = tValsObs;
+        SSV_Stats.pairPcDescriptives = pairPcDescriptives;
     end
     
     clear nullDataMat observedData pValuesPairwise thisPerm tValsNull tValsObs tValueIndex var1 var2 varInt cohens_d
@@ -256,4 +250,4 @@ end
 
 
 % save important stats info
-save([destDir '/' 'BBT_STATS_Control.mat'],'MCAv_Stats','PCAv_Stats','MCAc_Stats','PCAc_Stats','pcCBFc_Stats','pcCBFv_Stats');
+save([destDir '/' 'EEG_Spectra_STATS.mat'],'Alpha_Stats','Alpha_Stats_BLC','SSV_Stats');

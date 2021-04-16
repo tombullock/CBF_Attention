@@ -101,9 +101,9 @@ for i=1:4
     bar(i,mean(barAccMat(:,i),1), 'FaceColor',thisColor./255); hold on
 end
 
-% plot individual data points using plotSpread
+%plot individual data points using plotSpread
 plotSpread(barAccMat,'distributionMarkers',{'.'},'distributionColors',{'k'});
-set(findall(1,'type','line','color','k'),'markerSize',16) %Change marker size
+set(findall(1,'type','line','color','k'),'markerSize',24) %Change marker size
 
 % plot error bars
 errorbar(1.25:1:4.25,mean(barAccMat,1),std(barAccMat,0,1)/sqrt(size(barAccMat,1)),...
@@ -114,7 +114,7 @@ box('off')
 %plotNames = {'Att. Ind/IC','Attend Pacman, No Kanizsa', 'Attend RSVP, Kanizsa', 'Attend RSVP, No Kanizsa'}
 %plotNames = {'AI/IC','AI/NIC', 'AL/IC', 'AL/NIC'};
 %set(gca,'xticklabel',plotNames,'FontSize',24,'xlim',[.5,4.5],'LineWidth',1.5)
-set(gca,'FontSize',24,'xlim',[.5,4.5],'LineWidth',1.5,'xticklabels',{' ',' ',' ',' '},'xtick',[],'ytick',0:.2:1)
+set(gca,'FontSize',32,'xlim',[.5,4.5],'LineWidth',1.5,'xticklabels',{' ',' ',' ',' '},'xtick',[],'ytick',0:.2:1)
 pbaspect([1,1,1])
 
 

@@ -75,7 +75,7 @@ set(gca,...
 'YTick',-4:2:10,...
 'box','off');
 
-pbaspect([2,1,1]);
+pbaspect([3,1,1]);
     
     
 

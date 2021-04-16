@@ -56,6 +56,36 @@ end
 
 save([destDir '/' 'ERPs_Master_Control.mat'],'ERP_Tar_nTrials','ERP_Tar','ERP_Std_nTrials','ERP_Std')
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 % LOAD RESAMPLED STATS
 load([destDir '/' 'ERP_Stats_Resampled_Control.mat'])
 
@@ -118,7 +148,7 @@ end
 
 set(gca,...
 'linewidth',1.5,...
-'fontsize',18,...
+'fontsize',24,...
 'XTick',[400,500,600,800,1000,1200],...
 'XTickLabel',[-100,0,100,300,500,700],...
 'box','off');
@@ -195,7 +225,7 @@ for iIter=1:length(pairwiseMat)
     
 end
 
-
+pbaspect([2,1,1]);
 
 
 

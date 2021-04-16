@@ -96,12 +96,12 @@ for iPlot=1:6
     %subplot(3,2,iPlot)
     
     data = [];
-    if iPlot==1; data = mean_MCAv; this_yLim = [30,70]; thisTitle = 'mean_MCAv';%[30,100];
-    elseif iPlot==3; data = mean_PCAv; this_yLim = [20,50]; thisTitle = 'mean_PCAv'; %[10,80];
-    elseif iPlot==5; data = mean_pc_CBFv_PCA_MCA; this_yLim = [0,12]; thisTitle = 'mean_pc_CBFv'; % [-5,22];
-    elseif iPlot==2; data = mean_MCA_CVC; this_yLim = [.3,.8]; thisTitle = 'mean_MCAcvc'; % [.1,1.1];
-    elseif iPlot==4; data = mean_PCA_CVC; this_yLim = [.2,.5]; thisTitle = 'mean_PCAcvc'; % [.1,1.1];
-    elseif iPlot==6; data = mean_pc_CVC_PCA_MCA; this_yLim = [-2,14]; thisTitle = 'mean_pc_CVC'; % [-5,25];
+    if iPlot==1; data = mean_MCAv; this_yLim = [20,80]; thisTitle = 'mean_MCAv'; this_yTick = 20:20:80; %[30,100];
+    elseif iPlot==3; data = mean_PCAv; this_yLim = [10,70]; thisTitle = 'mean_PCAv'; this_yTick = 10:20:70; %[10,80];
+    elseif iPlot==5; data = mean_pc_CBFv_PCA_MCA; this_yLim = [-5,25]; thisTitle = 'mean_pc_CBFv'; this_yTick = -5:5:25;% [-5,22];
+    elseif iPlot==2; data = mean_MCA_CVC; this_yLim = [.2,1.2]; thisTitle = 'mean_MCAcvc'; this_yTick = .2:.2:1.2; % [.1,1.1];
+    elseif iPlot==4; data = mean_PCA_CVC; this_yLim = [.2,.8]; thisTitle = 'mean_PCAcvc'; this_yTick = .2:.2:.8; % [.1,1.1];
+    elseif iPlot==6; data = mean_pc_CVC_PCA_MCA; this_yLim = [-5,30]; thisTitle = 'mean_pc_CVC'; this_yTick = -5:5:30;% [-5,25];
     end
     
     % define colors for lines
@@ -117,22 +117,23 @@ for iPlot=1:6
         bar(i,mean(data(:,i),1), 'FaceColor',thisColor./255); hold on
     end
     
-%     % plot individual data points using plotSpread
-%     plotSpread(data,'distributionMarkers',{'.'},'distributionColors',{'k'});
-%     set(findall(1,'type','line','color','k'),'markerSize',16) %Change marker size
+    % plot individual data points using plotSpread
+    plotSpread(data,'distributionMarkers',{'.'},'distributionColors',{'k'});
+    set(findall(iPlot,'type','line','color','k'),'markerSize',24) %Change marker size
     
     % plot error bars
     errorbar(1.25:1:4.25,mean(data,1),std(data,0,1)/sqrt(size(data,1)),...
         'Color','k','LineStyle','none','LineWidth',2.5,'CapSize',10); %
     
     % edit plot characteristics
-    set(gca,'FontSize',42,...
+    set(gca,'FontSize',36,...
         'xlim',[.5,4.5],...
         'LineWidth',1.5,...
         'xticklabels',{' ',' ',' ',' '},...
         'xtick',[],...
         'ylim',this_yLim,...
-        'box','off');
+        'YTick',this_yTick,...
+        'box','off'); %        
     
     pbaspect([1,1,1])
     

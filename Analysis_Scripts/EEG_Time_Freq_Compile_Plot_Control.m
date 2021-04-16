@@ -57,7 +57,7 @@ for iChan=1;%1:4
             'xticklabel',[0,100,300,500],...
             'YTick',[1,4,8,12,16,20,24,28]*1,...
             'YTickLabel',[1,4,8,12,16,20,24,28],...
-            'FontSize',24,...
+            'FontSize',32,...
             'LineWidth',1.5);
         
         colormap jet
@@ -66,8 +66,8 @@ for iChan=1;%1:4
     
     
     % draw rectangle to indicate sig theta (150-250ms)
-    rectangle('Position',[77,4,36,4],'LineWidth',3,'LineStyle','--'); % indicates sig. theta from 150-300ms
-    rectangle('Position',[127,8,24,4],'LineWidth',3,'LineStyle','--'); % indicates sig. alpha from 400-500ms
+    rectangle('Position',[77,4,36,4],'LineWidth',3,'LineStyle','--'); % indicates sig. theta from 200-350
+    rectangle('Position',[127,9,24,3],'LineWidth',3,'LineStyle','--'); % indicates sig. alpha from 400-500ms
     
     
     end
@@ -80,11 +80,11 @@ end
 
 
 % create bar plots for sig different regions
-h=figure;%('Units','normalized','OuterPosition',[0.659026724336034                         0         0.269857089903338                         1]);
+h=figure('OuterPosition',[676   581   880   420]);
 for iPlot=1:2
     subplot(1,2,iPlot);
     if iPlot==1; theseFreqs=4:8; theseTimes = 77:113;
-    elseif iPlot==2; theseFreqs=8:12; theseTimes = 127:151;
+    elseif iPlot==2; theseFreqs=9:12; theseTimes = 127:151;
     end
     
     % generate data
@@ -112,17 +112,23 @@ for iPlot=1:2
     
     
     % plot error bars
-    errorbar(1:2,mean_theseData,sem_theseData,...
+    errorbar(1.25:2.25,mean_theseData,sem_theseData,...
         'Color','k','LineStyle','none','LineWidth',2.5,'CapSize',10); %
     
     set(gca,'box','off','xticklabels',{' ',' ',' ',' '},'xtick',[],'FontSize',34,'linewidth',1.5,'xlim',[.5,2.5])
     
     pbaspect([1,1,1])
     
+        
+    % plot individual data points using plotSpread
+    dataForPlotSpread = theseData;
+    plotSpread(dataForPlotSpread,'distributionMarkers',{'.'},'distributionColors',{'k'});
+    set(findall(h,'type','line','color','k'),'markerSize',24) %Change marker size
+    clear dataForPlotSpread
     
 end
 
-
+saveas(h,[destDirPlot '/' 'ERSP_Bar_Plots_Theta_Alpha_Control.eps'],'epsc')
 %%% MANUALLY SAVE PLOT AND RESIZE %%%
 
 

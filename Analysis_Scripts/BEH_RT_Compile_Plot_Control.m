@@ -85,7 +85,7 @@ end
 
 
 
-h=figure;%('Position',[353 614 724 313]);
+h=figure('Units','normalized','Position',[0.2588    0.5340    0.1850    0.3327]);%('Position',[353 614 724 313]);
 
 %% plot accuracy
 
@@ -108,7 +108,7 @@ end
 
 % plot individual data points using plotSpread
 plotSpread(barRTmat,'distributionMarkers',{'.'},'distributionColors',{'k'});
-set(findall(1,'type','line','color','k'),'markerSize',16) %Change marker size
+set(findall(1,'type','line','color','k'),'markerSize',24) %Change marker size
 
 % plot error bars
 errorbar(1.25:1:2.25,mean(barRTmat,1),std(barRTmat,0,1)/sqrt(size(barRTmat,1)),...
@@ -120,14 +120,16 @@ box('off')
 %plotNames = {'AI/IC','AI/NIC', 'AL/IC', 'AL/NIC'};
 %set(gca,'xticklabel',plotNames,'FontSize',24,'xlim',[.5,4.5],'LineWidth',1.5)
 %set(gca,'FontSize',24,'xlim',[.5,4.5],'LineWidth',1.5,'xticklabels',{' ',' ',' ',' '},'xtick',[],'ytick',0:.2:1)
+set(gca,'FontSize',36,'xlim',[.5,2.5],'LineWidth',1.5,'xticklabels',{' ',' ',' ',' '},'xtick',[],'ytick',900:100:1300,'ylim',[900,1300]);
+
 pbaspect([1,1,1])
 
 
 % save figure
-saveas(h,[plotDir '/' 'Behavior_Acc_Control.eps'],'epsc')
+saveas(h,[plotDir '/' 'Behavior_RT_Control.eps'],'epsc')
 
 % save bar accuracy matrix
-save([compiledDir '/' 'BEH_Acc_Master_Control.mat'],'barRTmat','subjects')
+save([compiledDir '/' 'BEH_RT_Master_Control.mat'],'barRTmat','subjects')
 
 % run descriptives and stats
 meanAcc = mean(barRTmat)

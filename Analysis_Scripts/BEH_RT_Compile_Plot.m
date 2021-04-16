@@ -109,7 +109,7 @@ end
 
 % plot individual data points using plotSpread
 plotSpread(barRTmat,'distributionMarkers',{'.'},'distributionColors',{'k'});
-set(findall(1,'type','line','color','k'),'markerSize',16) %Change marker size
+set(findall(1,'type','line','color','k'),'markerSize',24) %Change marker size
 
 % plot error bars
 errorbar(1.25:1:4.25,mean(barRTmat,1),std(barRTmat,0,1)/sqrt(size(barRTmat,1)),...
@@ -120,7 +120,7 @@ box('off')
 %plotNames = {'Att. Ind/IC','Attend Pacman, No Kanizsa', 'Attend RSVP, Kanizsa', 'Attend RSVP, No Kanizsa'}
 %plotNames = {'AI/IC','AI/NIC', 'AL/IC', 'AL/NIC'};
 %set(gca,'xticklabel',plotNames,'FontSize',24,'xlim',[.5,4.5],'LineWidth',1.5)
-set(gca,'FontSize',24,'xlim',[.5,4.5],'LineWidth',1.5,'xticklabels',{' ',' ',' ',' '},'xtick',[],'ytick',[900:100:1300],'ylim',[900,1300])
+set(gca,'FontSize',32,'xlim',[.5,4.5],'LineWidth',1.5,'xticklabels',{' ',' ',' ',' '},'xtick',[],'ytick',[900:100:1300],'ylim',[900,1300])
 pbaspect([1,1,1])
 
 % save figure

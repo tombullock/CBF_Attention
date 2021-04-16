@@ -25,14 +25,14 @@ load([sourceDir '/' 'EEG_Spectra.mat'])
 
 
 % loop through different datasets and run analyses
-for iData=1:3
+for iData=1:2 % only alphas in this script
     
     % which data?
     if iData==1 % alpha (regular)
-        observedData = [mean(mean(allSpectra(:,:,1,10:15,find(freqs==8):find(freqs==12)),4),5), mean(mean(allSpectra(:,:,2,10:15,find(freqs==8):find(freqs==12)),4),5)];
+        observedData = [mean(mean(allSpectra(:,:,1,10:15,find(freqs==9):find(freqs==12)),4),5), mean(mean(allSpectra(:,:,2,10:15,find(freqs==9):find(freqs==12)),4),5)];
     elseif iData==2
         
-        thisAlpha = [mean(mean(allSpectra(:,:,1,10:15,find(freqs==8):find(freqs==12)),4),5), mean(mean(allSpectra(:,:,2,10:15,find(freqs==8):find(freqs==12)),4),5)];
+        thisAlpha = [mean(mean(allSpectra(:,:,1,10:15,find(freqs==9):find(freqs==12)),4),5), mean(mean(allSpectra(:,:,2,10:15,find(freqs==9):find(freqs==12)),4),5)];
         
         thisThetaBeta = [...  % for baseline corr
             mean(mean(allSpectra(:,:,1,10:15,[find(freqs==4):find(freqs==8)-1, find(freqs==15):find(freqs==20)]),4),5), ...
@@ -47,7 +47,7 @@ for iData=1:3
         
         freqIdx = 533; % freq - 16.6667
     
-        observedData = mean(mean(allSpectra(:,:,2,10:15,find(freqs==8):find(freqs==12)),4),5);
+        observedData = mean(mean(allSpectra(:,:,2,10:15,find(freqs==9):find(freqs==12)),4),5);
         
     end
     
@@ -250,4 +250,4 @@ end
 
 
 % save important stats info
-save([destDir '/' 'EEG_Spectra_STATS.mat'],'Alpha_Stats','Alpha_Stats_BLC','SSV_Stats');
+save([destDir '/' 'EEG_Spectra_STATS.mat'],'Alpha_Stats','Alpha_Stats_BLC');

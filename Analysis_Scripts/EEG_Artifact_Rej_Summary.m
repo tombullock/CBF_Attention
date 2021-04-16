@@ -23,7 +23,9 @@ for iSub=1:length(subjects)
         elseif   iCond==4; thisCond='hypoxia';
         end
     
-        load([sourceDir '/' sprintf('sj%d_%s_erp_std_ft_ep.mat',sjNum,thisCond)])
+        %load([sourceDir '/' sprintf('sj%d_%s_erp_std_ft_ep.mat',sjNum,thisCond)])
+        load([sourceDir '/' sprintf('sj%d_%s_erp_tar_hit_ft_ep.mat',sjNum,thisCond)])
+        
         
         artifactRejSummary(iSub,iCond) = pcRejTrials;
         

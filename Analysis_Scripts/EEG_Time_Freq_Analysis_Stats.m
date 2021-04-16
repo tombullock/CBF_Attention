@@ -34,7 +34,7 @@ for iTimes = 1:12
     
            theseTimes = [1,13; 14,25; 26,38; 39,50; 51,63; 64,76; 77,88; 89,100; 101,113; 114,126; 127,138; 139,151];
            
-           theseFreqs = [1,3; 4,7; 8,12; 13,30];
+           theseFreqs = [1,3; 4,7; 9,12; 18,30];% was orig 13:30 because forgot to remove lower beta freqs
            
            theseChans = [1,3; 4,6; 7,9; 10,15];
            

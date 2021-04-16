@@ -65,8 +65,10 @@ for iChan=5;%1:4
         
             % draw rectangle to indicate sig theta (150-250ms)
     rectangle('Position',[64,4,36,4],'LineWidth',3,'LineStyle','--'); % indicates sig. theta from 150-300ms
-    rectangle('Position',[139,8,12,4],'LineWidth',3,'LineStyle','--'); % indicates sig. alpha from 450-500ms
-    rectangle('Position',[101,13,12,17],'LineWidth',3,'LineStyle','--'); % indicates sig. beta from 300-350ms
+    rectangle('Position',[139,9,12,3],'LineWidth',3,'LineStyle','--'); % indicates sig. alpha from 450-500ms
+    %rectangle('Position',[101,13,12,17],'LineWidth',3,'LineStyle','--'); %
+    %indicates sig. beta from 300-350ms [non longer comes out when remove
+    %ssvep activity from beta]
         
     end
     
@@ -75,12 +77,14 @@ end
 
 
 % create bar plots for sig different regions
-h=figure;%('Units','normalized','OuterPosition',[0.659026724336034                         0         0.269857089903338                         1]);
-for iPlot=1:3
-    subplot(1,3,iPlot);
+h=figure('OuterPosition',[4         512        1743         489]);
+%h=figure('OuterPosition',[0.5272         0    0.4167    1.0000],'Units','normalized');
+
+for iPlot=1:2
+    subplot(1,2,iPlot);
     if iPlot==1; theseFreqs=4:8; theseTimes = 64:100;
-    elseif iPlot==2; theseFreqs=8:12; theseTimes = 139:151;
-    elseif iPlot==3; theseFreqs=13:30; theseTimes = 101:113;
+    elseif iPlot==2; theseFreqs=9:12; theseTimes = 139:151;
+    elseif iPlot==3; theseFreqs=18:30; theseTimes = 101:113; % was 13:30 originally because forgot to exclude lower beta due to ssvep
     end
     
     % generate data
@@ -108,15 +112,25 @@ for iPlot=1:3
     
     
     % plot error bars
-    errorbar(1:1:4,mean_theseData,sem_theseData,...
+    errorbar(1.25:1:4.25,mean_theseData,sem_theseData,...
         'Color','k','LineStyle','none','LineWidth',2.5,'CapSize',10); %
     
     set(gca,'box','off','xticklabels',{' ',' ',' ',' '},'xtick',[],'FontSize',34,'linewidth',1.5,'xlim',[.5,4.5])
     
-    pbaspect([1,1,1])
+    pbaspect([2,1,1])
+    
+    % plot individual data points using plotSpread
+    dataForPlotSpread = theseData;
+    plotSpread(dataForPlotSpread,'distributionMarkers',{'.'},'distributionColors',{'k'});
+    set(findall(h,'type','line','color','k'),'markerSize',20) %Change marker size
+    clear dataForPlotSpread
     
     
 end
+
+saveas(h,[destDirPlot '/' 'ERSP_Bar_Plots_Theta_Alpha_Beta' '.eps'],'epsc')
+
+
 
 %% SAVE PLOT MANUALLY!!! %%%
 

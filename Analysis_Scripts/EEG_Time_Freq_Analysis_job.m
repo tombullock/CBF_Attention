@@ -13,7 +13,7 @@ close all
 subjects = [134,237,350,576,577,578,588,592,249,997:999]; % no 350,577 for Hv
 
 % if run on local machine(0), else if run on cluster(1)
-processInParallel=1;
+processInParallel=0;
 
 % cluster settings
 if processInParallel

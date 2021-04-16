@@ -35,10 +35,12 @@ thisRed = [255 0 0 ];
 thisBlue = [30 144 255];
 thisMagenta = [153 50 204];
 
-h=figure('OuterPosition',[676   680   577   322]);
+h=figure('OuterPosition',[676   765   653   236]);
 
 for iPhase=1:2
     subplot(1,2,iPhase)
+    
+
     for iPlot=1:4
         
         if      iPlot==1; thisColor = thisGreen;
@@ -49,6 +51,12 @@ for iPhase=1:2
         
         meanData = smooth(squeeze(mean(mean(allSpectra(:,iPlot,iPhase,theseChans,:),1),4)),8);
         
+        if iPlot==1   
+            rectangle('Position',[9,0.005,3,.6],...
+                'FaceColor',[.8,.8,.8],...
+                'EdgeColor',[.8,.8,.8]); hold on
+        end
+        
         plot(freqs,meanData,...
             'color',thisColor./255,...
             'LineWidth',3); hold on
@@ -56,12 +64,13 @@ for iPhase=1:2
         set(gca,...
             'xlim',[4,20],...
             'ylim',[0,.6],...
-            'ytick',0:.1:.6,...
+            'ytick',0:.2:.6,...
             'box','off',...
             'fontsize',18,...
             'LineWidth',1.5);
         
-        pbaspect([1,1,1]);
+        pbaspect([2,1,1]);
+        
         
         
     end
@@ -87,7 +96,7 @@ for iPhase=1:2
         subplot(2,4,cnt)
  
         chans = 1:15;
-        freqIdx = find(freqs==8):find(freqs==12);
+        freqIdx = find(freqs==9):find(freqs==12);
         meanData = squeeze(mean(mean(allSpectra(:,iPlot,iPhase,chans,freqIdx),1),5));
         
         topoplot(meanData,chanlocs(1:15),...
@@ -114,9 +123,9 @@ for iPhase=1:2
         elseif  iPlot==4; thisColor = thisMagenta;
         end
        
-        data = squeeze(mean(mean(allSpectra(:,iPlot,iPhase,theseChans,find(freqs==8):find(freqs==12)),4),5));
-        meanData = squeeze(mean(mean(mean(allSpectra(:,iPlot,iPhase,theseChans,find(freqs==8):find(freqs==12)),1),4),5));
-        stdData = std(squeeze(mean(mean(allSpectra(:,iPlot,iPhase,theseChans,find(freqs==8):find(freqs==12)),4),5)))./sqrt(size(allSpectra,1));
+        data = squeeze(mean(mean(allSpectra(:,iPlot,iPhase,theseChans,find(freqs==9):find(freqs==12)),4),5));
+        meanData = squeeze(mean(mean(mean(allSpectra(:,iPlot,iPhase,theseChans,find(freqs==9):find(freqs==12)),1),4),5));
+        stdData = std(squeeze(mean(mean(allSpectra(:,iPlot,iPhase,theseChans,find(freqs==9):find(freqs==12)),4),5)))./sqrt(size(allSpectra,1));
         
         dataForPlotSpread(:,cnt) = data;
         
@@ -126,7 +135,7 @@ for iPhase=1:2
 
         
         % plot error bars
-        errorbar(cnt+.25,meanData,stdData,...
+        errorbar(cnt+.35,meanData,stdData,...
             'Color','k','LineStyle','none','LineWidth',2.5,'CapSize',10); %
         
         % edit plot characteristics
@@ -135,24 +144,27 @@ for iPhase=1:2
             'LineWidth',1.5,...
             'xticklabels',{' ',' ',' ',' '},...
             'xtick',[],...
-            'ylim',[0 .35],....
-            'box','off');
+            'box','off');             %'ylim',[0 .35],....
+
         
         pbaspect([1,1,1])
         
     end
 end
 
-% % plot individual data points using plotSpread
-% plotSpread(dataForPlotSpread,'distributionMarkers',{'.'},'distributionColors',{'k'});
-% set(findall(h3,'type','line','color','k'),'markerSize',16) %Change marker size
-% clear dataForPlotSpread
+% plot individual data points using plotSpread
+plotSpread(dataForPlotSpread,'distributionMarkers',{'.'},'distributionColors',{'k'});
+set(findall(h3,'type','line','color','k'),'markerSize',16) %Change marker size
+clear dataForPlotSpread
 
 % save
 saveas(h3,[destDir '/' 'EEG_Bars_Alpha.eps'],'epsc');
 
 
 % generate topo plots for SSVEP [REMEMBER SJ350 [idx3]]
+
+% remove sj
+allSpectra = allSpectra([1,2,4:12],:,:,:,:);
 
 h4=figure('OuterPosition',[676   640   577   362]);
 
@@ -226,16 +238,16 @@ for iPlot=1:4
         'LineWidth',1.5,...
         'xticklabels',{' ',' ',' ',' '},...
         'xtick',[],...
-        'ylim',[0 1],....
-        'box','off');
+        'ylim',[0,2.6],...
+        'box','off');%'ylim',[0 1],....
     
     pbaspect([1,1,1])
     
 end
 
-% % plot individual data points using plotSpread
-% plotSpread(dataForPlotSpread,'distributionMarkers',{'.'},'distributionColors',{'k'});
-% set(findall(h5,'type','line','color','k'),'markerSize',16) %Change marker size
+% plot individual data points using plotSpread
+plotSpread(dataForPlotSpread,'distributionMarkers',{'.'},'distributionColors',{'k'});
+set(findall(h5,'type','line','color','k'),'markerSize',20) %Change marker size
 
 % save
 saveas(h5,[destDir '/' 'EEG_Bars_SSVEP.eps'],'epsc');

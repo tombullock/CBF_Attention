@@ -51,7 +51,7 @@ for iSub=1:length(subjects)
         % apply Butterworth Filter (better alternative to try)
         filterorder = 3;
         type = 'bandpass';
-        [z1,p1] = butter(filterorder, [8,12]./(EEG.srate/2),type);
+        [z1,p1] = butter(filterorder, [9,12]./(EEG.srate/2),type);
         data = double(EEG.data);
         tempEEG = NaN(size(data,1),EEG.pnts,size(data,3));
         for x = 1:size(data,1) % loop through chans

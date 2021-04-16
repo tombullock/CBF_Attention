@@ -56,13 +56,73 @@ PCA_BBT_HYPERAIR_NEW(:,10) = [];
 % subjectsAll = [134,237,350,576,577,578,588,592,249,997:999];
 
 
-% run regressions point by point
-for i=1:length(downsampledHilbert)
+
+% loop through conditions
+for iCond=1:2
     
-    [B,BINT,R,RINT,REG_STATS_HYPERAIR(i,:)] =  regress(downsampledHilbert(:,1,i+m),[PCA_BBT_HYPERAIR_NEW(i,:)', MCA_BBT_HYPERAIR_NEW(i,:)', ones(9,1) ]);
-    [B,BINT,R,RINT,REG_STATS_HYPOCAP(i,:)] =  regress(downsampledHilbert(:,2,i+m),[PCA_BBT_HYPOCAP_NEW(i,:)', MCA_BBT_HYPOCAP_NEW(i,:)', ones(9,1) ]);
+    clear rValsObs rValsNull
     
+    % loop through samples
+    for i=1:length(downsampledHilbert)
+        
+        i
+        
+        if iCond==1
+            observedData = [downsampledHilbert(:,1,i+m),PCA_BBT_HYPERAIR_NEW(i,:)',MCA_BBT_HYPERAIR_NEW(i,:)'];
+        elseif iCond==2
+            observedData = [downsampledHilbert(:,2,i+m),PCA_BBT_HYPOCAP_NEW(i,:)',MCA_BBT_HYPOCAP_NEW(i,:)'];
+        end
+        
+        % generate resampled iterations for ANOVA/t-tests
+        for j=1:1000
+            
+            for ii=1:size(observedData,1)    % for each row of the observed data
+                thisPerm = randperm(size(observedData,2)); % shuffle colums for each row
+                for k=1:length(thisPerm)
+                    nullDataMat(ii,k,j) = observedData(ii,thisPerm(k));
+                end
+            end
+            
+        end
+        
+        % run regressions on null data mat to generate mat of nulls
+        for j=1:1000
+            [~,~,~,~,stats] = regress(nullDataMat(:,1,j),[nullDataMat(:,2,j),nullDataMat(:,3,j),ones(9,1)]);
+            rValsNull(j) = stats(1);
+        end
+        
+        % run regression on observed data mat
+        [~,~,~,~,stats] = regress(observedData(:,1),[observedData(:,2),observedData(:,3),ones(9,1)]);
+        rValsObs = stats(1);
+        
+        % sort null R values
+        rValsNull = sort(rValsNull,2,'descend');
+        
+        
+        % compare obs to null
+        [c, rValueIndex] = min(abs(rValsNull - rValsObs(1,1)));
+        
+             
+        % convert to percentiles
+        rValueSigStats(i,iCond) = rValueIndex./1000;
+        
+        % store R observed values
+        all_rVals(i,iCond) = rValsObs;
+        
+        
+        
+    end
 end
+
+
+
+% % run regressions point by point
+% for i=1:length(downsampledHilbert)
+%     
+%     [B,BINT,R,RINT,REG_STATS_HYPERAIR(i,:)] =  regress(downsampledHilbert(:,1,i+m),[PCA_BBT_HYPERAIR_NEW(i,:)', MCA_BBT_HYPERAIR_NEW(i,:)', ones(9,1) ]);
+%     [B,BINT,R,RINT,REG_STATS_HYPOCAP(i,:)] =  regress(downsampledHilbert(:,2,i+m),[PCA_BBT_HYPOCAP_NEW(i,:)', MCA_BBT_HYPOCAP_NEW(i,:)', ones(9,1) ]);
+%     
+% end
 
 % generate plot
 h=figure('OuterPosition',[1   354   722   347]);
@@ -76,8 +136,9 @@ thisGray = [128,128,128]./255;
 % plot the R-square and p-values from the pbp correlation
 for iPlot=1:2
     
-    if      iPlot==1; theseData = REG_STATS_HYPERAIR(:,1); thisColor = thisGray; theseDataStats = REG_STATS_HYPERAIR(:,3);
-    elseif  iPlot==2; theseData = REG_STATS_HYPOCAP(:,1); thisColor = thisBlue; theseDataStats = REG_STATS_HYPOCAP(:,3);
+    
+    if      iPlot==1; theseData = all_rVals(:,1); thisColor = thisGray; theseDataStats = rValueSigStats(:,1);
+    elseif  iPlot==2; theseData = all_rVals(:,2); thisColor = thisBlue; theseDataStats = rValueSigStats(:,2);
     end
     
     subplot(1,2,iPlot);

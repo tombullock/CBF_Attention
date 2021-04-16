@@ -29,10 +29,10 @@ for iData=1:2
     
     % which data?
     if iData==1 % alpha (regular)
-        observedData = [mean(mean(allSpectra(:,:,1,10:15,find(freqs==8):find(freqs==12)),4),5), mean(mean(allSpectra(:,:,2,10:15,find(freqs==8):find(freqs==12)),4),5)];
+        observedData = [mean(mean(allSpectra(:,:,1,10:15,find(freqs==9):find(freqs==12)),4),5), mean(mean(allSpectra(:,:,2,10:15,find(freqs==9):find(freqs==12)),4),5)];
     elseif iData==2
         
-        thisAlpha = [mean(mean(allSpectra(:,:,1,10:15,find(freqs==8):find(freqs==12)),4),5), mean(mean(allSpectra(:,:,2,10:15,find(freqs==8):find(freqs==12)),4),5)];
+        thisAlpha = [mean(mean(allSpectra(:,:,1,10:15,find(freqs==9):find(freqs==12)),4),5), mean(mean(allSpectra(:,:,2,10:15,find(freqs==9):find(freqs==12)),4),5)];
         
         thisThetaBeta = [...  % for baseline corr
             mean(mean(allSpectra(:,:,1,10:15,[find(freqs==4):find(freqs==8)-1, find(freqs==15):find(freqs==20)]),4),5), ...

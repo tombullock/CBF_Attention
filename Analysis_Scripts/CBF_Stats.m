@@ -138,15 +138,21 @@ for iData=[1,2,4,5,3,6]
     if ismember(iData,[1,2,4,5])
         
         % do t-tests on observed data
-        for iTest=1:6
+        % [airR,airT,hcapR,hcapT,hpoR,hpoT,hpoxR,hpoxT]]
+        for iTest=1:10
             if       iTest==1; thisPair=[1,3]; % hcap rest
             elseif   iTest==2; thisPair=[1,5]; % hpo rest
             elseif   iTest==3; thisPair=[1,7]; % hpox rest
             elseif   iTest==4; thisPair=[2,4]; % hcap task
             elseif   iTest==5; thisPair=[2,6]; % hpo task
             elseif   iTest==6; thisPair=[2,8]; % hpox task
+                
+            elseif  iTest==7; thisPair=[1,2]; % airR vs airT
+            elseif  iTest==8; thisPair=[3,4]; % hpoR vs hpoT
+            elseif  iTest==9; thisPair=[5,6]; % hcapR vs hcapT
+            elseif  iTest==10; thisPair=[7,8]; % hpoxR vs hpoxT
             end
-            
+                
             [H,P,CI,STATS] = ttest(observedData(:,thisPair(1)),observedData(:,thisPair(2)));
             tValsObs(1,iTest) = STATS.tstat;
             cohens_d(iTest)=computeCohen_d(observedData(:,thisPair(1)),observedData(:,thisPair(2)),'paired');
@@ -173,6 +179,11 @@ for iData=[1,2,4,5,3,6]
         [c tValueIndex(5)] = min(abs(tValsNull - tValsObs(1,5)));
         [c tValueIndex(6)] = min(abs(tValsNull - tValsObs(1,6)));
         
+        [c tValueIndex(7)] = min(abs(tValsNull - tValsObs(1,7)));
+        [c tValueIndex(8)] = min(abs(tValsNull - tValsObs(1,8)));
+        [c tValueIndex(9)] = min(abs(tValsNull - tValsObs(1,9)));
+        [c tValueIndex(10)] = min(abs(tValsNull - tValsObs(1,10)));
+        
         % convert to percentiles
         tValueIndex = tValueIndex./1000;
         pValuesPairwise = tValueIndex;
@@ -195,7 +206,7 @@ for iData=[1,2,4,5,3,6]
         
         % compare critical t score to distribution and present 0 (ns) or 1(sig)
         % values in output
-        for i=1:6
+        for i=1:10
             if tValsObs(1,i)<0 && tValsObs(1,i)<tCriticalNeg
                 tValsObs(4,i)=1;
             elseif tValsObs(1,i)>0 && tValsObs(1,i)>tCriticalPos
